@@ -63,3 +63,6 @@
 | Small scale (1,000 questions) | Generate 10K+ questions with comparable quality through automated validation |
 | No diagnostic capabilities | KG structure enables stratified sampling across entity types, relation types, and knowledge domains |
 | Close to saturation (72%) | Target out-of-distribution results significantly different from current benchmarks |
+
+
+> We're not just making SimpleQA bigger - we're making it *diagnostic, controllable, and scientifically reproducible. While SimpleQA tells you a model failed, our version tells you exactly why it failed and what type of reasoning* it struggles with. This is essential for building reliable AI systems, not just benchmarking them
