@@ -1,16 +1,50 @@
-### Variant A — Benchmark / dataset framing (closest to *SimpleQA*-style)
+**SimpleQA** is a 4,326-question factual accuracy benchmark created by OpenAI where questions are adversarially collected against GPT-4, primarily sourced from Wikipedia and other web sources
 
-**Abstract.** Short-form factuality remains difficult to evaluate at scale: older Wikipedia-linked resources such as **WikiQA** focus on answer-sentence selection and contain on the order of a few thousand questions, limiting coverage and headroom for modern models. ([Microsoft][1]) More recent benchmarks like **SimpleQA** emphasize *single, indisputable answers* and easy grading, but are still constrained in size (4,326 questions) and require substantial filtering for reliability (e.g., **SimpleQA Verified**, 1,000 prompts). ([OpenAI CDN][2]) We introduce **Graph-Grounded SimpleQA (GG-SimpleQA)**, a pipeline to construct a **large, verifiable short-answer factuality benchmark** from Wikipedia by leveraging explicit structure. We first generate per-article knowledge graphs using **KGGen**, a text-to-KG generator that reduces graph sparsity via entity clustering and de-duplication. ([arXiv][3]) We then adapt a **STaRK-inspired** semi-structured synthesis procedure to propose candidate fact-seeking questions whose answers correspond to specific nodes/relations in the extracted graph, yielding automatically grounded question–answer pairs. ([arXiv][4]) To ensure benchmark quality, we apply a two-stage verification protocol: (i) targeted human review on ambiguity and answerability, and (ii) an LLM judge that checks whether the reference answer is *explicitly supported by the source article* and rejects underspecified items. Scaling to **10,000 articles × ~5 questions/article**, GG-SimpleQA targets **~50,000** graded, short-answer questions—**1–2 orders of magnitude larger** than prior short-form factuality sets—enabling finer-grained measurement and more robust model comparisons. 
+**SimpleQA Verified** refines this through a rigorous multi-stage filtering pipeline that reduces the dataset to 1,000 high-quality questions by removing duplicate sources, applying semantic and TF-IDF de-duplication (using 0.77 cosine similarity cutoff), balancing topic and answer-type distributions, filtering for maximum difficulty (keeping only questions that all frontier models answer incorrectly), and conducting manual review for URL cleaning, source quality verification, date precision, and metadata enrichment (identifying 3.7% requiring reasoning and 7.3% being multi-step)
 
----
+Both benchmarks evaluate models using a three-tier grading system (correct/incorrect/not attempted) with LLM-as-judge evaluation, revealing that even state-of-the-art models are close to saturation [SimpleQA-Verified Leaderboard](https://www.kaggle.com/benchmarks/deepmind/simpleqa-verified) with Gemini-3-Pro at 72%. 
 
-### Variant B — Method + experiments framing (closest to *pipeline + ablations* pitch)
+**Issues**
+1. Limited multi-hop reasoning: Only 7.3% are multi-step questions identified post-hoc by classifier, with no principled control over reasoning depth. [data](https://www.kaggle.com/datasets/deepmind/simpleqa-verified/data)
+2. Static and non-updatable: Manual curation makes updates expensive and slow, causing temporal facts to become stale over time
+3. Small scale after filtering: SimpleQA Verified's rigorous quality control reduces dataset to only 1,000 questions, limiting statistical power and coverage
+4. No diagnostic capabilities: Provides aggregate accuracy scores without interpretable failure analysis across knowledge types or reasoning patterns
+5. Evals are close to saturation
 
-**Abstract.** We study whether **graph-mediated synthesis** can scale the creation of **high-reliability short-answer factuality evaluations** beyond current benchmarks. SimpleQA demonstrates that short, fact-seeking questions with **single, indisputable answers** can be graded cleanly, but its construction remains bottlenecked by curation (4,326 questions) and subsequent filtering for reliability (e.g., SimpleQA Verified, 1,000 prompts). ([OpenAI CDN][2]) We propose a structure-first alternative: given a Wikipedia article, we generate an article-level knowledge graph with **KGGen**, which clusters and resolves entities to reduce sparsity and improve downstream usability. ([arXiv][3]) From this graph, we produce candidate factual questions using a **STaRK-inspired** semi-structured query synthesis approach that integrates relational constraints with textual grounding, yielding questions that map to specific graph entities/edges with deterministic reference answers. ([arXiv][4]) We then validate each item via a hybrid protocol: minimal human review for ambiguity plus an LLM-based judge that verifies **answer presence and support** in the original article, rejecting items that are not directly answerable from the provided context. Our target scale is **~50,000 questions** (10,000 articles × 5 questions), enabling two core experiments: (1) **direct prompting** (article → QA) versus **graph-mediated generation** (article → KG → QA) to test whether explicit structure improves answerability and reduces ambiguity; and (2) **memorization-oriented training comparisons**, contrasting standard supervised fine-tuning (SFT) with KL-regularized approaches under fixed compute to quantify gains in parametric factuality on the resulting benchmark. The outcome is a scalable recipe for producing large, clean, and auditable factuality evaluations grounded in Wikipedia.
+
+**From Knowledge Graph to QA**
+
+The following are some of the available methods for creating factual QA Pairs from knowledge graphs
+
+- **Knowledge Questions from Knowledge Graphs** (Oct 2016) - [arXiv](https://arxiv.org/pdf/1610.09935)
+  *KG Input:* DBpedia triples (entity + relation + entity). Selects named entity as answer, constructs triple-pattern query, uses templates to verbalize into natural language.
+  *Focus:* Quiz-style multiple-choice generation with distractor selection and difficulty estimation via Jeopardy! data.
+
+- **KGLens** (Dec 2023) - [arXiv](https://arxiv.org/pdf/2312.11539)
+  *KG Input:* Domain-specific KG edges (19K+ edges across 3 KBs). Uses graph-guided question generator with importance sampling based on graph structure.
+  *Focus:* LLM knowledge probing and factuality assessment—achieves 95.7% accuracy vs human annotators.
+
+- **FactChecker: The Earth is Flat?** (Jan 2024) - [arXiv](https://arxiv.org/pdf/2401.00761)
+  *KG Input:* Fact triplets from large-scale knowledge databases. Rule-based generation of Yes-No, Multiple-Choice, and WH questions for single-hop and multi-hop relations.
+  *Focus:* Detecting LLM factual errors (up to 45% error rates found); test cases can fine-tune models to improve accuracy.
+
+- **STaRK** (Apr 2024, NeurIPS 2024) - [arXiv](https://arxiv.org/pdf/2404.13207)
+  *KG Input:* Semi-structured KBs combining textual properties + relational structure. Synthesizes queries integrating relational info with complex text properties.
+  *Focus:* LLM retrieval benchmark across product search, academic papers, and precision medicine domains.
+
+- **ECKGBench** (Mar 2025) - [arXiv](https://arxiv.org/pdf/2503.15990)
+  *KG Input:* Large-scale e-commerce KG with standardized automated question generation workflow.
+  *Focus:* E-commerce LLM evaluation with emphasis on hallucination detection; includes human annotation and verification.
+
+- **KGQuest** (Nov 2025) - [arXiv](https://arxiv.org/pdf/2511.11258)
+  *KG Input:* KG triplets clustered by relation type → template derivation using entity/relation type rules → LLM refinement for linguistic quality.
+  *Focus:* Scalable, deterministic pipeline balancing factual accuracy with natural language fluency via LLM polishing.
 
 
-[1]: https://www.microsoft.com/en-us/download/details.aspx?id=52419&utm_source=chatgpt.com "Download Microsoft Research WikiQA Corpus from Official ..."
-[2]: https://cdn.openai.com/papers/simpleqa.pdf?utm_source=chatgpt.com "Measuring short-form factuality in large language models"
-[3]: https://arxiv.org/abs/2502.09956?utm_source=chatgpt.com "KGGen: Extracting Knowledge Graphs from Plain Text with Language Models"
-[4]: https://arxiv.org/abs/2404.13207?utm_source=chatgpt.com "STaRK: Benchmarking LLM Retrieval on Textual and ..."
-[5]: https://web.stanford.edu/class/cs197/assignments/project.html "CS197 | Project"
+**Solving SimpleQA issues**
+1. Systematic knowledge coverage: KG structure enables stratified sampling across entity types, relation types, and knowledge domains for comprehensive evaluation
+2. Controllable multi-hop reasoning: Graph traversal naturally generates questions of varying reasoning depth (1-hop, 2-hop, n-hop) by design, not post-hoc classification
+3. Automated scalability: Pipeline generates orders of magnitude more questions (10K+) compared to SimpleQA Verified's 1,000, with comparable quality through automated validation
+
+
+
