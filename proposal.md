@@ -11,8 +11,9 @@ Both benchmarks evaluate models using a three-tier grading system (correct/incor
 4. No diagnostic capabilities: Provides aggregate accuracy scores without interpretable failure analysis across knowledge types or reasoning patterns
 5. Evals are close to saturation
 
+---
 
-**From Knowledge Graph to QA**
+**KG to Factual QA generation**
 
 The following are some of the available methods for creating factual QA Pairs from knowledge graphs
 
@@ -40,11 +41,22 @@ The following are some of the available methods for creating factual QA Pairs fr
   *KG Input:* KG triplets clustered by relation type → template derivation using entity/relation type rules → LLM refinement for linguistic quality.
   *Focus:* Scalable, deterministic pipeline balancing factual accuracy with natural language fluency via LLM polishing.
 
+---
 
-**Solving SimpleQA issues**
+**GG SimpleQA Method**
+
+1. Create an article selection pipeline based on topic, popularity, length, etc...
+2. Use [KGGen](https://github.com/stair-lab/kg-gen), to generate knowledge graphs from those articles
+3. Potentially include human sampling verification here
+4. Use KGQuest or FactChecker for QA generation across multiple categories and n-hop.
+
+---
+
+**SimpleQA Flaws we'd solve**
 1. Systematic knowledge coverage: KG structure enables stratified sampling across entity types, relation types, and knowledge domains for comprehensive evaluation
 2. Controllable multi-hop reasoning: Graph traversal naturally generates questions of varying reasoning depth (1-hop, 2-hop, n-hop) by design, not post-hoc classification
 3. Automated scalability: Pipeline generates orders of magnitude more questions (10K+) compared to SimpleQA Verified's 1,000, with comparable quality through automated validation
+4. Results ideally considerably != of 72%, out of distribution.
 
-
+---
 
