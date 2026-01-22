@@ -1,0 +1,464 @@
+{
+  "entities": [
+    "75% of the ballots",
+    "Herman Long",
+    "December 1938",
+    "Joe Tinker",
+    "Harry Hooper",
+    "Fred Clarke",
+    "Wild Bill Donovan",
+    "Earle Combs",
+    "Lou Criger",
+    "Smoky Joe Wood",
+    "Kid Gleason",
+    "late 19th century",
+    "Jimmy Archer",
+    "Kid Elberfeld",
+    "Elmer Flick",
+    "Jack Coombs",
+    "1938 Baseball Hall of Fame balloting",
+    "George Sisler",
+    "committee of six members",
+    "10 candidates",
+    "Gabby Street",
+    "Red Faber",
+    "Red Dooin",
+    "Fielder Jones",
+    "Bill Terry",
+    "Sam Rice",
+    "Bill Dinneen",
+    "Eppa Rixey",
+    "Red Murray",
+    "Baseball Writers' Association of America",
+    "Ray Schalk",
+    "Zack Wheat",
+    "Centennial Commission",
+    "pitcher Grover Cleveland Alexander",
+    "Chief Bender",
+    "January 1938",
+    "George Burns",
+    "Nap Rucker",
+    "Howard Ehmke",
+    "Baseball Hall of Fame",
+    "10 initial inductees",
+    "Joe Dugan",
+    "Clark Griffith",
+    "Hub Perdue",
+    "Eddie Foster",
+    "1900s",
+    "Jake Stahl",
+    "Fred Tenney",
+    "Arlie Latham",
+    "Dazzy Vance",
+    "Addie Joss",
+    "Chief Zimmer",
+    "non-players",
+    "baseball",
+    "Rabbit Maranville",
+    "Rube Marquard",
+    "Mordecai Brown",
+    "Bill Bradley",
+    "Eddie Grant",
+    "Marty Bergen",
+    "Firpo Marberry",
+    "Jake Daubert",
+    "Jesse Burkett",
+    "Ginger Beaumont",
+    "Clyde Milan",
+    "Bob Meusel",
+    "Alexander Cartwright",
+    "Andy Coakley",
+    "Urban Shocker",
+    "revision of the rules",
+    "Miller Huggins",
+    "Roger Bresnahan",
+    "five individuals in 1937",
+    "Wilbert Robinson",
+    "Sam Crawford",
+    "Grover Cleveland Alexander",
+    "Ray Chapman",
+    "active players",
+    "Amos Rusie",
+    "Bill Dahlen",
+    "Art Fletcher",
+    "BBWAA ballot",
+    "1910s",
+    "1840s",
+    "Hall of Fame",
+    "Willie Keeler",
+    "Jack Chesbro",
+    "Dolf Luque",
+    "Max Carey",
+    "Ira Thomas",
+    "Dickey Kerr",
+    "Babe Adams",
+    "Jimmy Sheckard",
+    "individuals who had been barred from baseball",
+    "Roger Peckinpaugh",
+    "Sherry Magee",
+    "Edd Roush",
+    "Ossee Schreckengost",
+    "Stuffy McInnis",
+    "Burleigh Grimes",
+    "real Hall of Fame",
+    "Stan Coveleski",
+    "Larry Doyle",
+    "Hank Gowdy",
+    "20th century",
+    "197 votes",
+    "Herb Pennock",
+    "writers' and commentators' wings",
+    "Walton Cruise",
+    "Doc Crandall",
+    "Casey Stengel",
+    "BBWAA",
+    "Duffy Lewis",
+    "Henry Chadwick",
+    "Hugh Duffy",
+    "Jack Barry",
+    "Hans Lobert",
+    "Cy Williams",
+    "first consistent playing rules",
+    "120 specific candidates",
+    "Bucky Harris",
+    "Ed Walsh",
+    "sportswriter (or commentator)",
+    "sportswriter",
+    "Ed Delahanty",
+    "Ross Youngs",
+    "1937 vote",
+    "Heinie Groh",
+    "Bobby Wallace",
+    "first teams",
+    "Pie Traynor",
+    "Nick Altrock",
+    "Art Nehf",
+    "Everett Scott",
+    "Johnny Kling",
+    "Wilbur Cooper",
+    "Jimmy Collins",
+    "Gavvy Cravath",
+    "1938 elections",
+    "Harry Heilmann",
+    "Pat Moran",
+    "outstanding service to base ball apart from playing the game",
+    "Joe Judge",
+    "Dave Bancroft",
+    "sport's supposed centennial year of 1939",
+    "Frank Chance",
+    "Mike Donlin",
+    "Rube Waddell",
+    "major league winter meetings",
+    "Hughie Jennings",
+    "262 ballots",
+    "New York City",
+    "1939",
+    "Johnny Evers",
+    "Eddie Plank",
+    "Kid Nichols",
+    "Buck Herzog",
+    "Joe McGinnity",
+    "2,475 individual votes",
+    "Charlie Irwin",
+    "Bill Carrigan",
+    "the following month",
+    "Rogers Hornsby",
+    "Frank Baker",
+    "Eddie Collins"
+  ],
+  "relations": [
+    [
+      "Baseball Writers' Association of America",
+      "were given authority to select players active in the",
+      "20th century"
+    ],
+    [
+      "Baseball Writers' Association of America",
+      "is abbreviated as",
+      "BBWAA"
+    ],
+    [
+      "Henry Chadwick",
+      "was a",
+      "sportswriter"
+    ],
+    [
+      "Hall of Fame",
+      "opted to have a small committee",
+      "Centennial Commission"
+    ],
+    [
+      "BBWAA vote",
+      "results were announced in",
+      "January 1938"
+    ],
+    [
+      "1938 elections",
+      "had a goal of",
+      "10 initial inductees"
+    ],
+    [
+      "BBWAA vote",
+      "was dominated by players of the",
+      "1900s"
+    ],
+    [
+      "Henry Chadwick",
+      "was a major force in",
+      "revision of the rules"
+    ],
+    [
+      "Grover Cleveland Alexander",
+      "received at least",
+      "75% of the ballots"
+    ],
+    [
+      "major league winter meetings",
+      "were in",
+      "New York City"
+    ],
+    [
+      "Grover Cleveland Alexander",
+      "was described as",
+      "pitcher Grover Cleveland Alexander"
+    ],
+    [
+      "first consistent playing rules",
+      "were for",
+      "baseball"
+    ],
+    [
+      "197 votes",
+      "were required for election in the",
+      "BBWAA vote"
+    ],
+    [
+      "Baseball Writers' Association of America",
+      "were to exclude",
+      "active players"
+    ],
+    [
+      "1938 elections",
+      "were conducted along much the same lines as",
+      "1937 vote"
+    ],
+    [
+      "Alexander Cartwright",
+      "was instrumental in organizing",
+      "first teams"
+    ],
+    [
+      "Centennial Commission",
+      "retained responsibility for selecting",
+      "non-players"
+    ],
+    [
+      "1938 Baseball Hall of Fame balloting",
+      "is about",
+      "1938 elections"
+    ],
+    [
+      "Centennial Commission",
+      "chose two inductees at",
+      "major league winter meetings"
+    ],
+    [
+      "2,475 individual votes",
+      "were for",
+      "120 specific candidates"
+    ],
+    [
+      "Grover Cleveland Alexander",
+      "was elected to the",
+      "Hall of Fame"
+    ],
+    [
+      "Alexander Cartwright",
+      "helped establish",
+      "first consistent playing rules"
+    ],
+    [
+      "10 initial inductees",
+      "were from the",
+      "20th century"
+    ],
+    [
+      "Centennial Commission",
+      "is described as a",
+      "committee of six members"
+    ],
+    [
+      "Hall of Fame",
+      "gave authority to",
+      "Baseball Writers' Association of America"
+    ],
+    [
+      "major league winter meetings",
+      "were in",
+      "December 1938"
+    ],
+    [
+      "Centennial Commission",
+      "choices were not announced until",
+      "the following month"
+    ],
+    [
+      "BBWAA vote",
+      "instructed voters to cast votes for",
+      "10 candidates"
+    ],
+    [
+      "Centennial Commission",
+      "selected",
+      "Henry Chadwick"
+    ],
+    [
+      "sport's supposed centennial year of 1939",
+      "is in",
+      "1939"
+    ],
+    [
+      "1938 elections",
+      "were conducted to select inductees to",
+      "Baseball Hall of Fame"
+    ],
+    [
+      "Henry Chadwick",
+      "promoted",
+      "baseball"
+    ],
+    [
+      "real Hall of Fame",
+      "is contrasted with",
+      "writers' and commentators' wings"
+    ],
+    [
+      "first teams",
+      "were in the",
+      "1840s"
+    ],
+    [
+      "Centennial Commission",
+      "selected",
+      "Alexander Cartwright"
+    ],
+    [
+      "75% of the ballots",
+      "was the threshold for induction to the",
+      "Hall of Fame"
+    ],
+    [
+      "BBWAA vote",
+      "was dominated by players of the",
+      "1910s"
+    ],
+    [
+      "Henry Chadwick",
+      "was inducted into the",
+      "real Hall of Fame"
+    ],
+    [
+      "BBWAA vote",
+      "had",
+      "262 ballots"
+    ],
+    [
+      "Centennial Commission",
+      "selected",
+      "five individuals in 1937"
+    ],
+    [
+      "Grover Cleveland Alexander",
+      "was selected via the",
+      "BBWAA ballot"
+    ],
+    [
+      "Henry Chadwick",
+      "promoted the game in the",
+      "late 19th century"
+    ],
+    [
+      "BBWAA vote",
+      "had",
+      "2,475 individual votes"
+    ],
+    [
+      "Centennial Commission",
+      "selected inductees for",
+      "outstanding service to base ball apart from playing the game"
+    ],
+    [
+      "Henry Chadwick",
+      "is a",
+      "sportswriter (or commentator)"
+    ],
+    [
+      "Hall of Fame",
+      "would honor induction upon its opening in",
+      "sport's supposed centennial year of 1939"
+    ],
+    [
+      "individuals who had been barred from baseball",
+      "had been barred from",
+      "baseball"
+    ],
+    [
+      "Baseball Hall of Fame",
+      "is referred to as",
+      "Hall of Fame"
+    ],
+    [
+      "BBWAA",
+      "conducted the",
+      "BBWAA vote"
+    ]
+  ],
+  "edges": [
+    "is referred to as",
+    "were conducted along much the same lines as",
+    "were required for election in the",
+    "gave authority to",
+    "promoted",
+    "were given authority to select players active in the",
+    "chose two inductees at",
+    "is in",
+    "is about",
+    "were in the",
+    "were for",
+    "was inducted into the",
+    "was described as",
+    "were from the",
+    "retained responsibility for selecting",
+    "had",
+    "was a major force in",
+    "is contrasted with",
+    "would honor induction upon its opening in",
+    "promoted the game in the",
+    "was instrumental in organizing",
+    "had been barred from",
+    "results were announced in",
+    "had a goal of",
+    "is abbreviated as",
+    "is described as a",
+    "was a",
+    "choices were not announced until",
+    "selected",
+    "is a",
+    "selected inductees for",
+    "was selected via the",
+    "was dominated by players of the",
+    "were conducted to select inductees to",
+    "instructed voters to cast votes for",
+    "conducted the",
+    "was elected to the",
+    "was the threshold for induction to the",
+    "helped establish",
+    "received at least",
+    "were in",
+    "opted to have a small committee",
+    "were to exclude"
+  ],
+  "entity_clusters": null,
+  "edge_clusters": null,
+  "entity_metadata": null
+}

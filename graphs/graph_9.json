@@ -1,0 +1,971 @@
+{
+  "entities": [
+    "Le spectre rouge",
+    "Dr. Skinium",
+    "Kalem Company",
+    "Joseph Kearns",
+    "The Bewildering Cabinet",
+    "Richard Mansfield",
+    "Peggy Ashcroft",
+    "GB",
+    "Ferdinand Zecca",
+    "La Marseillaise",
+    "A Curious Dream",
+    "Cecil Hepworth",
+    "Robert Harron",
+    "Satan s'amuse",
+    "Sheldon Leonard",
+    "Barbara Kent",
+    "The Clock-Maker's Secret",
+    "Syncroscope",
+    "Mike Mazurki",
+    "Paris",
+    "Haverhill, Massachusetts",
+    "Jack Albertson",
+    "Universal",
+    "Le Placard infernal",
+    "Robert Macaire and Bertrand",
+    "Helen Kleeb",
+    "Sidney Olcott",
+    "Rosalind Russell",
+    "Germany",
+    "Salaviinanpolttajat",
+    "L'\u00e9clipse du soleil en pleine lune",
+    "La Cuisine de l'ogre",
+    "Edgar Barrier",
+    "George K. Spoor",
+    "Segundo de Chom\u00f3n",
+    "Vancouver (film)",
+    "The Lion Hunt",
+    "US",
+    "La Course des sergents de ville",
+    "Le Scarab\u00e9e d'or",
+    "John Marley",
+    "Essanay Studios",
+    "Phillips Holmes",
+    "Cesar Romero",
+    "Alexander Knox",
+    "Joan Davis",
+    "John McIntire",
+    "Le Tunnel sous la Manche ou le Cauchemar franco-anglais",
+    "Denmark",
+    "First Prize for the Cello",
+    "Vancouver",
+    "Paul Douglas",
+    "Walter R. Booth",
+    "George Kleine",
+    "Linda Arvidson",
+    "1907 in film",
+    "Canada",
+    "Georges Mendel",
+    "Eddie Quillan",
+    "Mary Treen",
+    "The Race for the Sausage",
+    "Tunneling the English Channel",
+    "The Moonshiners",
+    "Samuel Long",
+    "Georges M\u00e9li\u00e8s",
+    "Katharine Hepburn",
+    "Ben-Hur: A Tale of the Christ",
+    "Mary Dresselhuys",
+    "That Fatal Sneeze",
+    "The Red Spectre",
+    "Cab Calloway",
+    "Ray Milland",
+    "Fay Wray",
+    "John Wayne",
+    "The Policemen's Little Run",
+    "Irene Tedrow",
+    "1907",
+    "Europe",
+    "Olive Borden",
+    "British Columbia",
+    "Good Glue Sticks",
+    "B.C. Electric streetcar",
+    "Austria",
+    "Le Secret de l'horloger",
+    "Laurence Olivier",
+    "Lina Basquette",
+    "Carl Laemmle",
+    "Fred Zinnemann",
+    "Kent Smith",
+    "Course \u00e0 la saucisse",
+    "Florence Turner",
+    "William Harbeck",
+    "Gene Autry",
+    "The Eclipse, or the Courtship of the Sun and Moon",
+    "Annabella",
+    "La Colle universelle",
+    "Burgess Meredith",
+    "phonographs",
+    "The Haunted Hotel",
+    "Gilbert M. Anderson",
+    "Alice Guy",
+    "Laughing Gas",
+    "New England",
+    "J. Stuart Blackton",
+    "The Prodigal Son",
+    "Salme Reek",
+    "Netherlands",
+    "Ben Hur",
+    "The Dancing Pig",
+    "Mr. Gay and Mrs.",
+    "Tala Birell",
+    "Chicago",
+    "Louis B. Mayer",
+    "Satan at Play",
+    "Romania",
+    "First Ben-Hur film",
+    "Joe Besser",
+    "The Doll's Revenge",
+    "Barbara Stanwyck",
+    "Louis Sparre",
+    "L\u00f8vejagten",
+    "Millard Mercury",
+    "Robert Young",
+    "English Channel",
+    "Premier Prix de violoncelle",
+    "Craig Reynolds",
+    "Adrienne Ames",
+    "Georges Wague",
+    "Under the Seas",
+    "Estonia",
+    "Deux Cents Milles sous les mers ou le Cauchemar du p\u00eacheur",
+    "Edwin S. Porter",
+    "Ben-Hur (1907 film)",
+    "Seattle",
+    "Peerless Film Manufacturing Company",
+    "Robert Macaire et Bertrand, les rois de cambrioleurs",
+    "Finland",
+    "Viggo Larsen",
+    "When the Devil Drives",
+    "How to Cure a Cold",
+    "Paula Wessely",
+    "Austria-Hungary",
+    "Jules Verne",
+    "Gaston Velle",
+    "Twenty Thousand Leagues Under the Seas",
+    "Frank J. Marion",
+    "Le Cochon Danseur",
+    "L'Enfant prodigue",
+    "France",
+    "Isabel Jewell",
+    "The Golden Beetle",
+    "Lewin Fitzhamon",
+    "New York City",
+    "William S. Hart",
+    "Variety",
+    "Ross Alexander",
+    "UK",
+    "In the Bogie Man's Cave",
+    "Teuvo Puro",
+    "Michel Carr\u00e9",
+    "Metro-Goldwyn-Mayer",
+    "Lew Wallace"
+  ],
+  "relations": [
+    [
+      "Vancouver (film)",
+      "country of origin",
+      "Canada"
+    ],
+    [
+      "The Doll's Revenge",
+      "was directed by",
+      "Cecil Hepworth"
+    ],
+    [
+      "Tunneling the English Channel",
+      "involves",
+      "English Channel"
+    ],
+    [
+      "Robert Macaire and Bertrand",
+      "was directed by",
+      "Georges M\u00e9li\u00e8s"
+    ],
+    [
+      "Joan Davis",
+      "born in",
+      "US"
+    ],
+    [
+      "Mike Mazurki",
+      "born in",
+      "Austria-Hungary"
+    ],
+    [
+      "John Wayne",
+      "born in",
+      "US"
+    ],
+    [
+      "In the Bogie Man's Cave",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Kalem Company",
+      "was founded by",
+      "George Kleine"
+    ],
+    [
+      "A Curious Dream",
+      "country of origin",
+      "US"
+    ],
+    [
+      "John McIntire",
+      "born in",
+      "US"
+    ],
+    [
+      "William Harbeck",
+      "set up a camera on",
+      "B.C. Electric streetcar"
+    ],
+    [
+      "Carl Laemmle",
+      "experiments led to development of",
+      "Syncroscope"
+    ],
+    [
+      "The Eclipse, or the Courtship of the Sun and Moon",
+      "is also known as",
+      "L'\u00e9clipse du soleil en pleine lune"
+    ],
+    [
+      "The Clock-Maker's Secret",
+      "is also known as",
+      "Le Secret de l'horloger"
+    ],
+    [
+      "Peerless Film Manufacturing Company",
+      "was founded in",
+      "Chicago"
+    ],
+    [
+      "First Prize for the Cello",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Laughing Gas",
+      "was directed by",
+      "Edwin S. Porter"
+    ],
+    [
+      "Paul Douglas",
+      "born in",
+      "US"
+    ],
+    [
+      "The Policemen's Little Run",
+      "country of origin",
+      "France"
+    ],
+    [
+      "L'Enfant prodigue",
+      "opened in",
+      "Paris"
+    ],
+    [
+      "The Golden Beetle",
+      "is also known as",
+      "Le Scarab\u00e9e d'or"
+    ],
+    [
+      "Helen Kleeb",
+      "born in",
+      "US"
+    ],
+    [
+      "Tunneling the English Channel",
+      "was directed by",
+      "Georges M\u00e9li\u00e8s"
+    ],
+    [
+      "Twenty Thousand Leagues Under the Seas",
+      "was written by",
+      "Jules Verne"
+    ],
+    [
+      "Robert Macaire and Bertrand",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Under the Seas",
+      "was directed by",
+      "Georges M\u00e9li\u00e8s"
+    ],
+    [
+      "Peerless Film Manufacturing Company",
+      "was founded by",
+      "George K. Spoor"
+    ],
+    [
+      "The Race for the Sausage",
+      "was directed by",
+      "Alice Guy"
+    ],
+    [
+      "First Prize for the Cello",
+      "is also known as",
+      "Premier Prix de violoncelle"
+    ],
+    [
+      "Sheldon Leonard",
+      "born in",
+      "US"
+    ],
+    [
+      "Kalem Company",
+      "was founded by",
+      "Samuel Long"
+    ],
+    [
+      "Barbara Kent",
+      "born in",
+      "Canada"
+    ],
+    [
+      "Mary Treen",
+      "born in",
+      "US"
+    ],
+    [
+      "The Prodigal Son",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Peerless Film Manufacturing Company",
+      "changed name to",
+      "Essanay Studios"
+    ],
+    [
+      "1907 in film",
+      "refers to year",
+      "1907"
+    ],
+    [
+      "The Doll's Revenge",
+      "country of origin",
+      "GB"
+    ],
+    [
+      "Robert Macaire and Bertrand",
+      "is also known as",
+      "Robert Macaire et Bertrand, les rois de cambrioleurs"
+    ],
+    [
+      "Olive Borden",
+      "born in",
+      "US"
+    ],
+    [
+      "The Haunted Hotel",
+      "country of origin",
+      "US"
+    ],
+    [
+      "Under the Seas",
+      "was based on",
+      "Twenty Thousand Leagues Under the Seas"
+    ],
+    [
+      "L'Enfant prodigue",
+      "is also known as",
+      "The Prodigal Son"
+    ],
+    [
+      "Louis B. Mayer",
+      "opened his first movie theatre in",
+      "Haverhill, Massachusetts"
+    ],
+    [
+      "Barbara Stanwyck",
+      "born in",
+      "US"
+    ],
+    [
+      "Isabel Jewell",
+      "born in",
+      "US"
+    ],
+    [
+      "Ben-Hur (1907 film)",
+      "was directed by",
+      "Sidney Olcott"
+    ],
+    [
+      "The Red Spectre",
+      "is also known as",
+      "Le spectre rouge"
+    ],
+    [
+      "Kent Smith",
+      "born in",
+      "US"
+    ],
+    [
+      "Under the Seas",
+      "country of origin",
+      "France"
+    ],
+    [
+      "The Eclipse, or the Courtship of the Sun and Moon",
+      "was directed by",
+      "Georges M\u00e9li\u00e8s"
+    ],
+    [
+      "Florence Turner",
+      "debuted in",
+      "How to Cure a Cold"
+    ],
+    [
+      "The Clock-Maker's Secret",
+      "was directed by",
+      "Gaston Velle"
+    ],
+    [
+      "L\u00f8vejagten",
+      "is also known as",
+      "The Lion Hunt"
+    ],
+    [
+      "When the Devil Drives",
+      "was directed by",
+      "Walter R. Booth"
+    ],
+    [
+      "Kalem Company",
+      "was founded by",
+      "Frank J. Marion"
+    ],
+    [
+      "First Ben-Hur film",
+      "was produced by",
+      "Kalem Company"
+    ],
+    [
+      "Under the Seas",
+      "is also known as",
+      "Deux Cents Milles sous les mers ou le Cauchemar du p\u00eacheur"
+    ],
+    [
+      "Variety",
+      "published its first film review in",
+      "1907"
+    ],
+    [
+      "Ben Hur",
+      "was directed by",
+      "Sidney Olcott"
+    ],
+    [
+      "The Golden Beetle",
+      "was directed by",
+      "Segundo de Chom\u00f3n"
+    ],
+    [
+      "Le Cochon Danseur",
+      "country of origin",
+      "France"
+    ],
+    [
+      "The Prodigal Son",
+      "was directed by",
+      "Michel Carr\u00e9"
+    ],
+    [
+      "L\u00f8vejagten",
+      "country of origin",
+      "Denmark"
+    ],
+    [
+      "Tunneling the English Channel",
+      "is also known as",
+      "Le Tunnel sous la Manche ou le Cauchemar franco-anglais"
+    ],
+    [
+      "Satan s'amuse",
+      "was directed by",
+      "Segundo de Chom\u00f3n"
+    ],
+    [
+      "Linda Arvidson",
+      "debuted in",
+      "Mr. Gay and Mrs."
+    ],
+    [
+      "Salaviinanpolttajat",
+      "country of origin",
+      "Finland"
+    ],
+    [
+      "Peggy Ashcroft",
+      "born in",
+      "UK"
+    ],
+    [
+      "Le Cochon Danseur",
+      "is also known as",
+      "The Dancing Pig"
+    ],
+    [
+      "The Eclipse, or the Courtship of the Sun and Moon",
+      "country of origin",
+      "France"
+    ],
+    [
+      "A Curious Dream",
+      "was directed by",
+      "J. Stuart Blackton"
+    ],
+    [
+      "Satan s'amuse",
+      "is also known as",
+      "Satan at Play"
+    ],
+    [
+      "Kalem Company",
+      "was founded in",
+      "New York City"
+    ],
+    [
+      "Edgar Barrier",
+      "born in",
+      "US"
+    ],
+    [
+      "Salaviinanpolttajat",
+      "was directed by",
+      "Teuvo Puro"
+    ],
+    [
+      "The Golden Beetle",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Salme Reek",
+      "born in",
+      "Estonia"
+    ],
+    [
+      "Ben-Hur (1907 film)",
+      "was produced by",
+      "Kalem Company"
+    ],
+    [
+      "Paula Wessely",
+      "born in",
+      "Austria"
+    ],
+    [
+      "The Race for the Sausage",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Good Glue Sticks",
+      "was directed by",
+      "Georges M\u00e9li\u00e8s"
+    ],
+    [
+      "Syncroscope",
+      "was developed in",
+      "Germany"
+    ],
+    [
+      "The Red Spectre",
+      "was directed by",
+      "Ferdinand Zecca"
+    ],
+    [
+      "That Fatal Sneeze",
+      "country of origin",
+      "GB"
+    ],
+    [
+      "Salaviinanpolttajat",
+      "is also known as",
+      "The Moonshiners"
+    ],
+    [
+      "La Marseillaise",
+      "country of origin",
+      "France"
+    ],
+    [
+      "The Red Spectre",
+      "was directed by",
+      "Segundo de Chom\u00f3n"
+    ],
+    [
+      "Tunneling the English Channel",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Robert Harron",
+      "debuted in",
+      "Dr. Skinium"
+    ],
+    [
+      "Ben Hur",
+      "country of origin",
+      "US"
+    ],
+    [
+      "Jack Albertson",
+      "born in",
+      "US"
+    ],
+    [
+      "Vancouver (film)",
+      "was directed by",
+      "William Harbeck"
+    ],
+    [
+      "Laurence Olivier",
+      "born in",
+      "UK"
+    ],
+    [
+      "Carl Laemmle",
+      "experimented with combining audio from",
+      "phonographs"
+    ],
+    [
+      "Katharine Hepburn",
+      "born in",
+      "US"
+    ],
+    [
+      "The Policemen's Little Run",
+      "is also known as",
+      "La Course des sergents de ville"
+    ],
+    [
+      "The Prodigal Son",
+      "starred",
+      "Georges Wague"
+    ],
+    [
+      "When the Devil Drives",
+      "country of origin",
+      "GB"
+    ],
+    [
+      "Laughing Gas",
+      "country of origin",
+      "US"
+    ],
+    [
+      "Joe Besser",
+      "born in",
+      "US"
+    ],
+    [
+      "That Fatal Sneeze",
+      "was directed by",
+      "Lewin Fitzhamon"
+    ],
+    [
+      "Ross Alexander",
+      "born in",
+      "US"
+    ],
+    [
+      "Good Glue Sticks",
+      "is also known as",
+      "La Colle universelle"
+    ],
+    [
+      "Fred Zinnemann",
+      "born in",
+      "Austria"
+    ],
+    [
+      "The Haunted Hotel",
+      "was directed by",
+      "J. Stuart Blackton"
+    ],
+    [
+      "Cab Calloway",
+      "born in",
+      "US"
+    ],
+    [
+      "Burgess Meredith",
+      "born in",
+      "US"
+    ],
+    [
+      "Carl Laemmle",
+      "was later of",
+      "Universal"
+    ],
+    [
+      "The Bewildering Cabinet",
+      "was directed by",
+      "Georges M\u00e9li\u00e8s"
+    ],
+    [
+      "First Ben-Hur film",
+      "was directed by",
+      "Sidney Olcott"
+    ],
+    [
+      "Adrienne Ames",
+      "born in",
+      "US"
+    ],
+    [
+      "Alexander Knox",
+      "born in",
+      "Canada"
+    ],
+    [
+      "The Policemen's Little Run",
+      "was directed by",
+      "Ferdinand Zecca"
+    ],
+    [
+      "Lina Basquette",
+      "born in",
+      "US"
+    ],
+    [
+      "William S. Hart",
+      "debuted in",
+      "Ben Hur"
+    ],
+    [
+      "L\u00f8vejagten",
+      "was directed by",
+      "Viggo Larsen"
+    ],
+    [
+      "Annabella",
+      "born in",
+      "France"
+    ],
+    [
+      "Mary Dresselhuys",
+      "born in",
+      "Netherlands"
+    ],
+    [
+      "Satan s'amuse",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Salaviinanpolttajat",
+      "was directed by",
+      "Louis Sparre"
+    ],
+    [
+      "Joseph Kearns",
+      "born in",
+      "US"
+    ],
+    [
+      "L'Enfant prodigue",
+      "was produced in",
+      "Europe"
+    ],
+    [
+      "The Clock-Maker's Secret",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Salaviinanpolttajat",
+      "was the first fictional film made in",
+      "Finland"
+    ],
+    [
+      "Cesar Romero",
+      "born in",
+      "US"
+    ],
+    [
+      "Tala Birell",
+      "born in",
+      "Romania"
+    ],
+    [
+      "Ben Hur",
+      "was based on",
+      "Ben-Hur: A Tale of the Christ"
+    ],
+    [
+      "The Bewildering Cabinet",
+      "country of origin",
+      "France"
+    ],
+    [
+      "The Race for the Sausage",
+      "is also known as",
+      "Course \u00e0 la saucisse"
+    ],
+    [
+      "Fay Wray",
+      "born in",
+      "Canada"
+    ],
+    [
+      "Gene Autry",
+      "born in",
+      "US"
+    ],
+    [
+      "John Marley",
+      "born in",
+      "US"
+    ],
+    [
+      "Phillips Holmes",
+      "born in",
+      "US"
+    ],
+    [
+      "Vancouver",
+      "is in",
+      "British Columbia"
+    ],
+    [
+      "The Bewildering Cabinet",
+      "is also known as",
+      "Le Placard infernal"
+    ],
+    [
+      "In the Bogie Man's Cave",
+      "was directed by",
+      "Georges M\u00e9li\u00e8s"
+    ],
+    [
+      "Louis B. Mayer",
+      "had the largest theatre chain in",
+      "New England"
+    ],
+    [
+      "The Red Spectre",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Good Glue Sticks",
+      "country of origin",
+      "France"
+    ],
+    [
+      "Rosalind Russell",
+      "born in",
+      "US"
+    ],
+    [
+      "Craig Reynolds",
+      "born in",
+      "US"
+    ],
+    [
+      "William Harbeck",
+      "is a film maker from",
+      "Seattle"
+    ],
+    [
+      "Ray Milland",
+      "born in",
+      "UK"
+    ],
+    [
+      "Le Cochon Danseur",
+      "was directed by",
+      "Millard Mercury"
+    ],
+    [
+      "William Harbeck",
+      "filmed downtown streets of",
+      "Vancouver"
+    ],
+    [
+      "Irene Tedrow",
+      "born in",
+      "US"
+    ],
+    [
+      "Ben-Hur (1907 film)",
+      "was based on",
+      "Ben-Hur: A Tale of the Christ"
+    ],
+    [
+      "Eddie Quillan",
+      "born in",
+      "US"
+    ],
+    [
+      "In the Bogie Man's Cave",
+      "is also known as",
+      "La Cuisine de l'ogre"
+    ],
+    [
+      "Robert Young",
+      "born in",
+      "US"
+    ],
+    [
+      "Ben-Hur: A Tale of the Christ",
+      "was written by",
+      "Lew Wallace"
+    ],
+    [
+      "Peerless Film Manufacturing Company",
+      "was founded by",
+      "Gilbert M. Anderson"
+    ],
+    [
+      "La Marseillaise",
+      "was directed by",
+      "Georges Mendel"
+    ]
+  ],
+  "edges": [
+    "is a film maker from",
+    "was the first fictional film made in",
+    "is also known as",
+    "was produced in",
+    "starred",
+    "country of origin",
+    "set up a camera on",
+    "is in",
+    "was based on",
+    "refers to year",
+    "was founded in",
+    "published its first film review in",
+    "experiments led to development of",
+    "changed name to",
+    "was produced by",
+    "involves",
+    "experimented with combining audio from",
+    "debuted in",
+    "was written by",
+    "born in",
+    "was founded by",
+    "opened his first movie theatre in",
+    "was later of",
+    "had the largest theatre chain in",
+    "filmed downtown streets of",
+    "opened in",
+    "was developed in",
+    "was directed by"
+  ],
+  "entity_clusters": null,
+  "edge_clusters": null,
+  "entity_metadata": null
+}

@@ -1,0 +1,12 @@
+[project]
+name = "expanded-simpleqa"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "datasets>=4.5.0",
+    "kg-gen @ git+https://github.com/stair-lab/kg-gen.git",
+    "litellm>=1.81.1",
+    "python-dotenv>=1.2.1",
+]

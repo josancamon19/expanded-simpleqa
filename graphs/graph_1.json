@@ -1,0 +1,431 @@
+{
+  "entities": [
+    "Al Nixon",
+    "Other batters",
+    "Dick Rudolph",
+    "Gil Gallagher",
+    "Starters by position",
+    "Billy Southworth",
+    "Harry Hulihan",
+    "Fred Nicholson",
+    "Philadelphia Phillies",
+    "Record vs. opponents",
+    "Pitching",
+    "Starting pitchers",
+    "Lloyd Christenbury",
+    "Tony Boeckel",
+    "Rube Marquard",
+    "Joe Genewich",
+    "Brooklyn Robins",
+    "St. Louis Cardinals",
+    "Mickey O'Neil",
+    "100 losses",
+    "eighth in the National League",
+    "Hank Gowdy",
+    "Bunny Roser",
+    "Cincinnati Reds",
+    "Hod Ford",
+    "Ray Powell",
+    "Hugh McQuillan",
+    "Chicago Cubs",
+    "Joe Oeschger",
+    "53 wins",
+    "Al Yeargin",
+    "Gene Lansing",
+    "record of 53 wins and 100 losses",
+    "Walton Cruise",
+    "National League",
+    "Other pitchers",
+    "Tim McNamara",
+    "New York Giants",
+    "1922 Boston Braves season",
+    "Snake Henry",
+    "Relief pitchers",
+    "Frank Gibson",
+    "Walter Barbare",
+    "Mule Watson",
+    "Garland Braxton",
+    "Larry Kopf",
+    "Boston Braves",
+    "Frank Miller",
+    "52nd season of the franchise",
+    "Joe Matthews",
+    "Walter Holke",
+    "Johnny Cooney",
+    "Dana Fillingim",
+    "Cy Morgan",
+    "Season standings",
+    "Pittsburgh Pirates",
+    "Player stats",
+    "Batting"
+  ],
+  "relations": [
+    [
+      "Record vs. opponents",
+      "includes team",
+      "St. Louis Cardinals"
+    ],
+    [
+      "1922 Boston Braves season",
+      "is",
+      "52nd season of the franchise"
+    ],
+    [
+      "Other pitchers",
+      "lists player",
+      "Joe Genewich"
+    ],
+    [
+      "Pitching",
+      "has part",
+      "Starting pitchers"
+    ],
+    [
+      "Starting pitchers",
+      "lists player",
+      "Frank Miller"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Gil Gallagher"
+    ],
+    [
+      "1922 Boston Braves season",
+      "resulted in",
+      "eighth in the National League"
+    ],
+    [
+      "Pitching",
+      "has part",
+      "Other pitchers"
+    ],
+    [
+      "Starters by position",
+      "lists player",
+      "Walter Holke"
+    ],
+    [
+      "Season standings",
+      "includes team",
+      "Brooklyn Robins"
+    ],
+    [
+      "Boston Braves",
+      "competed in",
+      "National League"
+    ],
+    [
+      "Starting pitchers",
+      "lists player",
+      "Dick Rudolph"
+    ],
+    [
+      "Season standings",
+      "includes team",
+      "Chicago Cubs"
+    ],
+    [
+      "Season standings",
+      "includes team",
+      "St. Louis Cardinals"
+    ],
+    [
+      "Other pitchers",
+      "lists player",
+      "Joe Matthews"
+    ],
+    [
+      "Record vs. opponents",
+      "includes team",
+      "Pittsburgh Pirates"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Snake Henry"
+    ],
+    [
+      "Other pitchers",
+      "lists player",
+      "Garland Braxton"
+    ],
+    [
+      "Player stats",
+      "has part",
+      "Batting"
+    ],
+    [
+      "1922 Boston Braves season",
+      "took place in",
+      "National League"
+    ],
+    [
+      "Relief pitchers",
+      "lists player",
+      "Gene Lansing"
+    ],
+    [
+      "Season standings",
+      "includes team",
+      "Pittsburgh Pirates"
+    ],
+    [
+      "Batting",
+      "has part",
+      "Other batters"
+    ],
+    [
+      "Starters by position",
+      "lists player",
+      "Tony Boeckel"
+    ],
+    [
+      "Starters by position",
+      "lists player",
+      "Larry Kopf"
+    ],
+    [
+      "Boston Braves",
+      "had",
+      "100 losses"
+    ],
+    [
+      "Other pitchers",
+      "lists player",
+      "Dana Fillingim"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Billy Southworth"
+    ],
+    [
+      "Record vs. opponents",
+      "includes team",
+      "Cincinnati Reds"
+    ],
+    [
+      "Starters by position",
+      "lists player",
+      "Ray Powell"
+    ],
+    [
+      "Record vs. opponents",
+      "includes team",
+      "New York Giants"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Walter Barbare"
+    ],
+    [
+      "Starting pitchers",
+      "lists player",
+      "Harry Hulihan"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Bunny Roser"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Frank Gibson"
+    ],
+    [
+      "Starters by position",
+      "lists player",
+      "Hod Ford"
+    ],
+    [
+      "Boston Braves",
+      "had",
+      "53 wins"
+    ],
+    [
+      "Record vs. opponents",
+      "includes team",
+      "Philadelphia Phillies"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Hank Gowdy"
+    ],
+    [
+      "Starters by position",
+      "lists player",
+      "Mickey O'Neil"
+    ],
+    [
+      "Starting pitchers",
+      "lists player",
+      "Al Yeargin"
+    ],
+    [
+      "Season standings",
+      "includes team",
+      "Cincinnati Reds"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Fred Nicholson"
+    ],
+    [
+      "Season standings",
+      "includes team",
+      "New York Giants"
+    ],
+    [
+      "Starting pitchers",
+      "lists player",
+      "Mule Watson"
+    ],
+    [
+      "1922 Boston Braves season",
+      "has section",
+      "Season standings"
+    ],
+    [
+      "Other pitchers",
+      "lists player",
+      "Hugh McQuillan"
+    ],
+    [
+      "Other batters",
+      "lists player",
+      "Lloyd Christenbury"
+    ],
+    [
+      "Other pitchers",
+      "lists player",
+      "Joe Oeschger"
+    ],
+    [
+      "Other pitchers",
+      "lists player",
+      "Tim McNamara"
+    ],
+    [
+      "Relief pitchers",
+      "lists player",
+      "Cy Morgan"
+    ],
+    [
+      "Season standings",
+      "includes team",
+      "Philadelphia Phillies"
+    ],
+    [
+      "Starting pitchers",
+      "lists player",
+      "Rube Marquard"
+    ],
+    [
+      "Pitching",
+      "has part",
+      "Relief pitchers"
+    ],
+    [
+      "1922 Boston Braves season",
+      "has section",
+      "Record vs. opponents"
+    ],
+    [
+      "Batting",
+      "has part",
+      "Starters by position"
+    ],
+    [
+      "Record vs. opponents",
+      "includes team",
+      "Boston Braves"
+    ],
+    [
+      "Starters by position",
+      "lists player",
+      "Al Nixon"
+    ],
+    [
+      "record of 53 wins and 100 losses",
+      "includes",
+      "100 losses"
+    ],
+    [
+      "Boston Braves",
+      "finished",
+      "eighth in the National League"
+    ],
+    [
+      "Starting pitchers",
+      "lists player",
+      "Johnny Cooney"
+    ],
+    [
+      "Boston Braves",
+      "had",
+      "record of 53 wins and 100 losses"
+    ],
+    [
+      "Starters by position",
+      "lists player",
+      "Walton Cruise"
+    ],
+    [
+      "Season standings",
+      "includes team",
+      "Boston Braves"
+    ],
+    [
+      "1922 Boston Braves season",
+      "is season of",
+      "Boston Braves"
+    ],
+    [
+      "record of 53 wins and 100 losses",
+      "includes",
+      "53 wins"
+    ],
+    [
+      "Player stats",
+      "has part",
+      "Pitching"
+    ],
+    [
+      "Record vs. opponents",
+      "includes team",
+      "Chicago Cubs"
+    ],
+    [
+      "1922 Boston Braves season",
+      "has section",
+      "Player stats"
+    ],
+    [
+      "Record vs. opponents",
+      "includes team",
+      "Brooklyn Robins"
+    ]
+  ],
+  "edges": [
+    "includes team",
+    "includes",
+    "lists player",
+    "competed in",
+    "is season of",
+    "took place in",
+    "has section",
+    "finished",
+    "resulted in",
+    "had",
+    "has part",
+    "is"
+  ],
+  "entity_clusters": null,
+  "edge_clusters": null,
+  "entity_metadata": null
+}

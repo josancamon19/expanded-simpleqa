@@ -1,0 +1,869 @@
+{
+  "entities": [
+    "Two Harbors, Minnesota",
+    "entered service August 25, 1891",
+    "candles",
+    "whaleback steamer",
+    "48.69806\u00b0N",
+    "Captain Boyce",
+    "Everett, Washington",
+    "enrolled in Duluth",
+    "cook",
+    "life raft",
+    "Marathon, Ontario",
+    "log cabin",
+    "Cleveland, Ohio",
+    "stern",
+    "storm",
+    "dry docked in West Superior",
+    "rounded hull shapes",
+    "whaleback ship design",
+    "Buffalo, New York",
+    "Canadian Pacific Railway",
+    "tugboats",
+    "256 feet long",
+    "1893 collision",
+    "Sault Ste. Marie Canal",
+    "crew of eight",
+    "whaleback freighter",
+    "bell",
+    "service period 1891\u20131899",
+    "fuel scarcity",
+    "Arthur A. Boyce",
+    "small life raft",
+    "American Steel Barge Company",
+    "US official number 53268",
+    "Pic Island",
+    "West Superior, Wisconsin",
+    "Sault Ste. Marie",
+    "load of iron ore",
+    "Great Lakes",
+    "iron ore",
+    "bow",
+    "whaleback barge",
+    "Canadian Pacific Railway track",
+    "gross tonnage 1,169 tons",
+    "Lake Superior",
+    "final trip of the shipping season",
+    "Colgate Hoyt",
+    "dive footage (about 1980)",
+    "Duluth, Minnesota",
+    "Pickands Mather & Company",
+    "Barge 115",
+    "Alexander McDougall",
+    "shipbuilders",
+    "turrets",
+    "dry docked in Duluth",
+    "Christopher Columbus (excursion liner)",
+    "rounded decks",
+    "Lake Erie",
+    "maritime historian Cris Kohl",
+    "Scottish immigrant",
+    "Whaleback 115",
+    "Superior, Wisconsin",
+    "grease",
+    "36 feet wide",
+    "bread (two loaves)",
+    "depth between 40 and 80 feet (12.2\u201324.4 m)",
+    "whaleback",
+    "St. Marys River",
+    "repairs",
+    "1894 collision",
+    "Lake George",
+    "Thomas Wilson",
+    "hull plates",
+    "A.D. Thompson",
+    "Christmas",
+    "second whaleback lost on the Great Lakes",
+    "101 (whaleback barge)",
+    "steam-powered ship (towing)",
+    "wreck located in 1980",
+    "stove",
+    "conoidal ends",
+    "American Steel Barge Company fleet",
+    "tree branches",
+    "coordinates 48\u00b041\u203253\u2033N 86\u00b039\u203217\u2033W",
+    "1897 grounding",
+    "Great Lakes captain",
+    "London",
+    "Soo Locks",
+    "No.115",
+    "ham",
+    "Mesaba (steamer)",
+    "86.65472\u00b0W",
+    "18.75 feet deep",
+    "cliff",
+    "home port Buffalo",
+    "keel plates",
+    "The 100 Best Great Lakes Shipwrecks \u2013 Volume II",
+    "rock bottom",
+    "City of Everett",
+    "115",
+    "final shipwreck on the Great Lakes during the 1800s",
+    "Middletown, Ontario",
+    "McDougall fleet",
+    "twisted steel plates",
+    "makeshift raft",
+    "entrepreneur",
+    "vertical sides (traditional freighters)",
+    "hull frames laid down May 21, 1891",
+    "inventor",
+    "Ontario",
+    "hull frames",
+    "wreck hunter Ryan LeBlanc",
+    "launched August 15, 1891",
+    "3,000 tons of iron ore",
+    "American whaleback barge",
+    "net tonnage 1,110 tons",
+    "pig boats",
+    "Charles W. Wetmore",
+    "115 wreck",
+    "wreck of 115",
+    "frostbitten feet"
+  ],
+  "relations": [
+    [
+      "115",
+      "had",
+      "gross tonnage 1,169 tons"
+    ],
+    [
+      "whaleback",
+      "were called",
+      "pig boats"
+    ],
+    [
+      "115",
+      "was near",
+      "Sault Ste. Marie"
+    ],
+    [
+      "Pickands Mather & Company",
+      "took over management of",
+      "American Steel Barge Company fleet"
+    ],
+    [
+      "The 100 Best Great Lakes Shipwrecks \u2013 Volume II",
+      "by",
+      "maritime historian Cris Kohl"
+    ],
+    [
+      "115",
+      "was",
+      "dry docked in West Superior"
+    ],
+    [
+      "bell",
+      "was retrieved from",
+      "wreck of 115"
+    ],
+    [
+      "115",
+      "was under tow of",
+      "A.D. Thompson"
+    ],
+    [
+      "crew of eight",
+      "made it home by",
+      "Christmas"
+    ],
+    [
+      "crew of eight",
+      "used",
+      "tree branches"
+    ],
+    [
+      "A.D. Thompson",
+      "is a",
+      "whaleback steamer"
+    ],
+    [
+      "115",
+      "broke",
+      "hull plates"
+    ],
+    [
+      "wreck of 115",
+      "was",
+      "wreck located in 1980"
+    ],
+    [
+      "115",
+      "had home port",
+      "home port Buffalo"
+    ],
+    [
+      "Arthur A. Boyce",
+      "is",
+      "Captain Boyce"
+    ],
+    [
+      "115",
+      "loaded",
+      "3,000 tons of iron ore"
+    ],
+    [
+      "101 (whaleback barge)",
+      "is a",
+      "whaleback barge"
+    ],
+    [
+      "115",
+      "was",
+      "final shipwreck on the Great Lakes during the 1800s"
+    ],
+    [
+      "crew of eight",
+      "stumbled upon",
+      "Canadian Pacific Railway track"
+    ],
+    [
+      "115",
+      "used",
+      "life raft"
+    ],
+    [
+      "115",
+      "was involved in",
+      "1894 collision"
+    ],
+    [
+      "dry docked in Duluth",
+      "for",
+      "repairs"
+    ],
+    [
+      "1894 collision",
+      "involved",
+      "Mesaba (steamer)"
+    ],
+    [
+      "115",
+      "is a",
+      "American whaleback barge"
+    ],
+    [
+      "115",
+      "had hull frames",
+      "hull frames"
+    ],
+    [
+      "115",
+      "also known as",
+      "Barge 115"
+    ],
+    [
+      "dry docked in West Superior",
+      "for",
+      "repairs"
+    ],
+    [
+      "115",
+      "was built in",
+      "Superior, Wisconsin"
+    ],
+    [
+      "115",
+      "was",
+      "enrolled in Duluth"
+    ],
+    [
+      "Alexander McDougall",
+      "promoted using",
+      "Christopher Columbus (excursion liner)"
+    ],
+    [
+      "Canadian Pacific Railway track",
+      "belongs to",
+      "Canadian Pacific Railway"
+    ],
+    [
+      "1894 collision",
+      "occurred on",
+      "Lake George"
+    ],
+    [
+      "The 100 Best Great Lakes Shipwrecks \u2013 Volume II",
+      "erroneously states intact",
+      "bow"
+    ],
+    [
+      "115",
+      "was built in",
+      "West Superior, Wisconsin"
+    ],
+    [
+      "whaleback",
+      "has",
+      "rounded decks"
+    ],
+    [
+      "115",
+      "was the",
+      "second whaleback lost on the Great Lakes"
+    ],
+    [
+      "log cabin",
+      "contained",
+      "stove"
+    ],
+    [
+      "1897 grounding",
+      "occurred on",
+      "St. Marys River"
+    ],
+    [
+      "dry docked in West Superior",
+      "occurred in",
+      "West Superior, Wisconsin"
+    ],
+    [
+      "115",
+      "required replacement of",
+      "hull plates"
+    ],
+    [
+      "Pic Island",
+      "in",
+      "Lake Superior"
+    ],
+    [
+      "115",
+      "had",
+      "net tonnage 1,110 tons"
+    ],
+    [
+      "115",
+      "was part of",
+      "American Steel Barge Company fleet"
+    ],
+    [
+      "115",
+      "drifted on",
+      "Lake Superior"
+    ],
+    [
+      "Thomas Wilson",
+      "is a",
+      "whaleback freighter"
+    ],
+    [
+      "115",
+      "entered service",
+      "entered service August 25, 1891"
+    ],
+    [
+      "whaleback",
+      "has",
+      "conoidal ends"
+    ],
+    [
+      "115",
+      "had",
+      "hull frames laid down May 21, 1891"
+    ],
+    [
+      "115",
+      "had",
+      "cook"
+    ],
+    [
+      "Alexander McDougall",
+      "is a",
+      "Great Lakes captain"
+    ],
+    [
+      "115",
+      "was in tow of",
+      "Colgate Hoyt"
+    ],
+    [
+      "crew of eight",
+      "carried",
+      "candles"
+    ],
+    [
+      "115",
+      "was involved in",
+      "1893 collision"
+    ],
+    [
+      "115",
+      "was built by",
+      "American Steel Barge Company"
+    ],
+    [
+      "whaleback ship design",
+      "designed by",
+      "Alexander McDougall"
+    ],
+    [
+      "115",
+      "was",
+      "18.75 feet deep"
+    ],
+    [
+      "3,000 tons of iron ore",
+      "is",
+      "iron ore"
+    ],
+    [
+      "crew of eight",
+      "were located by",
+      "Canadian Pacific Railway"
+    ],
+    [
+      "dive footage (about 1980)",
+      "shows intact",
+      "turrets"
+    ],
+    [
+      "Alexander McDougall",
+      "sent",
+      "Charles W. Wetmore"
+    ],
+    [
+      "115",
+      "was involved in",
+      "1897 grounding"
+    ],
+    [
+      "115",
+      "used",
+      "small life raft"
+    ],
+    [
+      "coordinates 48\u00b041\u203253\u2033N 86\u00b039\u203217\u2033W",
+      "latitude",
+      "48.69806\u00b0N"
+    ],
+    [
+      "twisted steel plates",
+      "located on",
+      "cliff"
+    ],
+    [
+      "115",
+      "was towed by a",
+      "steam-powered ship (towing)"
+    ],
+    [
+      "American Steel Barge Company",
+      "founded by",
+      "Alexander McDougall"
+    ],
+    [
+      "whaleback",
+      "has",
+      "rounded hull shapes"
+    ],
+    [
+      "crew of eight",
+      "used",
+      "log cabin"
+    ],
+    [
+      "115",
+      "is a",
+      "whaleback barge"
+    ],
+    [
+      "115",
+      "was",
+      "36 feet wide"
+    ],
+    [
+      "whaleback",
+      "lacks",
+      "vertical sides (traditional freighters)"
+    ],
+    [
+      "115",
+      "was under the command of",
+      "Arthur A. Boyce"
+    ],
+    [
+      "crew of eight",
+      "made",
+      "makeshift raft"
+    ],
+    [
+      "Pic Island",
+      "near",
+      "Marathon, Ontario"
+    ],
+    [
+      "115",
+      "carried",
+      "load of iron ore"
+    ],
+    [
+      "City of Everett",
+      "built in",
+      "Everett, Washington"
+    ],
+    [
+      "wreck of 115",
+      "has coordinates",
+      "coordinates 48\u00b041\u203253\u2033N 86\u00b039\u203217\u2033W"
+    ],
+    [
+      "115",
+      "is a shipwreck on the",
+      "Great Lakes"
+    ],
+    [
+      "115",
+      "was an",
+      "unrigged barge"
+    ],
+    [
+      "1893 collision",
+      "involved",
+      "Thomas Wilson"
+    ],
+    [
+      "Alexander McDougall",
+      "is a",
+      "Scottish immigrant"
+    ],
+    [
+      "coordinates 48\u00b041\u203253\u2033N 86\u00b039\u203217\u2033W",
+      "longitude",
+      "86.65472\u00b0W"
+    ],
+    [
+      "115",
+      "carried",
+      "iron ore"
+    ],
+    [
+      "wreck of 115",
+      "is the",
+      "115 wreck"
+    ],
+    [
+      "wreck of 115",
+      "was discovered by",
+      "wreck hunter Ryan LeBlanc"
+    ],
+    [
+      "115",
+      "encountered",
+      "storm"
+    ],
+    [
+      "Thomas Wilson",
+      "had in tow",
+      "101 (whaleback barge)"
+    ],
+    [
+      "115",
+      "bound for",
+      "Lake Erie"
+    ],
+    [
+      "115",
+      "was",
+      "256 feet long"
+    ],
+    [
+      "wreck of 115",
+      "at",
+      "depth between 40 and 80 feet (12.2\u201324.4 m)"
+    ],
+    [
+      "cook",
+      "suffered",
+      "frostbitten feet"
+    ],
+    [
+      "115",
+      "had complement",
+      "crew of eight"
+    ],
+    [
+      "115",
+      "broke away on",
+      "Lake Superior"
+    ],
+    [
+      "115",
+      "required replacement of",
+      "keel plates"
+    ],
+    [
+      "Alexander McDougall",
+      "is an",
+      "inventor"
+    ],
+    [
+      "Alexander McDougall",
+      "was unable to persuade",
+      "shipbuilders"
+    ],
+    [
+      "115",
+      "had US official number",
+      "US official number 53268"
+    ],
+    [
+      "dry docked in Duluth",
+      "occurred in",
+      "Duluth, Minnesota"
+    ],
+    [
+      "Pickands Mather & Company",
+      "based in",
+      "Cleveland, Ohio"
+    ],
+    [
+      "Alexander McDougall",
+      "is an",
+      "entrepreneur"
+    ],
+    [
+      "115",
+      "departed from",
+      "Two Harbors, Minnesota"
+    ],
+    [
+      "crew of eight",
+      "made it to",
+      "Middletown, Ontario"
+    ],
+    [
+      "Charles W. Wetmore",
+      "sent to",
+      "London"
+    ],
+    [
+      "115",
+      "has service period",
+      "service period 1891\u20131899"
+    ],
+    [
+      "dive footage (about 1980)",
+      "shows intact",
+      "stern"
+    ],
+    [
+      "crew of eight",
+      "carried",
+      "bread (two loaves)"
+    ],
+    [
+      "115",
+      "also known as",
+      "No.115"
+    ],
+    [
+      "115",
+      "had",
+      "turrets"
+    ],
+    [
+      "115",
+      "was",
+      "dry docked in Duluth"
+    ],
+    [
+      "115",
+      "crashed into",
+      "Pic Island"
+    ],
+    [
+      "twisted steel plates",
+      "associated with wrecking at",
+      "Pic Island"
+    ],
+    [
+      "115",
+      "was built for",
+      "McDougall fleet"
+    ],
+    [
+      "crew of eight",
+      "carried",
+      "grease"
+    ],
+    [
+      "crew of eight",
+      "carried",
+      "ham"
+    ],
+    [
+      "115",
+      "was",
+      "launched August 15, 1891"
+    ],
+    [
+      "Colgate Hoyt",
+      "proceeded to",
+      "Sault Ste. Marie"
+    ],
+    [
+      "115",
+      "broke away from",
+      "Colgate Hoyt"
+    ],
+    [
+      "Colgate Hoyt",
+      "is a",
+      "whaleback freighter"
+    ],
+    [
+      "Mesaba (steamer)",
+      "is a",
+      "steam-powered ship (towing)"
+    ],
+    [
+      "American Steel Barge Company",
+      "founded in",
+      "Superior, Wisconsin"
+    ],
+    [
+      "McDougall fleet",
+      "based in",
+      "Buffalo, New York"
+    ],
+    [
+      "Colgate Hoyt",
+      "enlisted",
+      "tugboats"
+    ],
+    [
+      "Marathon, Ontario",
+      "in",
+      "Ontario"
+    ],
+    [
+      "Colgate Hoyt",
+      "proceeded due to",
+      "fuel scarcity"
+    ],
+    [
+      "115",
+      "was enrolled in",
+      "Duluth, Minnesota"
+    ],
+    [
+      "wreck of 115",
+      "located on",
+      "rock bottom"
+    ],
+    [
+      "American Steel Barge Company fleet",
+      "based in",
+      "Buffalo, New York"
+    ],
+    [
+      "115",
+      "also known as",
+      "Whaleback 115"
+    ],
+    [
+      "St. Marys River",
+      "is below",
+      "Sault Ste. Marie Canal"
+    ],
+    [
+      "115",
+      "headed for",
+      "Soo Locks"
+    ],
+    [
+      "115",
+      "is a",
+      "whaleback"
+    ]
+  ],
+  "edges": [
+    "was built for",
+    "headed for",
+    "for",
+    "is",
+    "near",
+    "also known as",
+    "occurred on",
+    "erroneously states intact",
+    "entered service",
+    "bound for",
+    "made it home by",
+    "is below",
+    "were called",
+    "was towed by a",
+    "occurred in",
+    "was enrolled in",
+    "stumbled upon",
+    "made it to",
+    "was under the command of",
+    "proceeded due to",
+    "is a",
+    "founded by",
+    "lacks",
+    "designed by",
+    "latitude",
+    "at",
+    "was under tow of",
+    "has",
+    "was in tow of",
+    "required replacement of",
+    "involved",
+    "associated with wrecking at",
+    "longitude",
+    "is a shipwreck on the",
+    "departed from",
+    "had",
+    "was unable to persuade",
+    "suffered",
+    "shows intact",
+    "by",
+    "made",
+    "encountered",
+    "belongs to",
+    "located on",
+    "had hull frames",
+    "promoted using",
+    "was built in",
+    "carried",
+    "contained",
+    "enlisted",
+    "had in tow",
+    "was retrieved from",
+    "has service period",
+    "drifted on",
+    "is an",
+    "was",
+    "sent to",
+    "loaded",
+    "founded in",
+    "based in",
+    "sent",
+    "took over management of",
+    "proceeded to",
+    "had complement",
+    "had US official number",
+    "in",
+    "were located by",
+    "was discovered by",
+    "broke",
+    "was near",
+    "was the",
+    "was part of",
+    "was involved in",
+    "built in",
+    "was built by",
+    "broke away on",
+    "has coordinates",
+    "had home port",
+    "broke away from",
+    "used",
+    "crashed into",
+    "is the",
+    "was an"
+  ],
+  "entity_clusters": null,
+  "edge_clusters": null,
+  "entity_metadata": null
+}

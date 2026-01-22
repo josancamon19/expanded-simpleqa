@@ -1,0 +1,6546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Knowledge Graph Explorer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            height: 100vh;
+            transition: grid-template-columns 0.3s ease;
+        }
+
+        .layout.sidebar-collapsed {
+            grid-template-columns: 0px 1fr;
+        }
+
+        .layout.sidebar-disabled {
+            grid-template-columns: 1fr;
+            width: 100%;
+        }
+
+        .layout.sidebar-disabled .main {
+            width: 100vw !important;
+        }
+
+        .layout.sidebar-disabled .tab-panel {
+            padding: 0 !important;
+            width: 100vw !important;
+        }
+
+        .layout.sidebar-disabled .network-panel {
+            width: 100vw !important;
+            height: 100vh !important;
+            border-radius: 0;
+            border: none;
+            max-width: none !important;
+        }
+
+        .layout.sidebar-disabled #networkCanvas {
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+        }
+
+        /* Force canvas to take full iframe space */
+        canvas#networkCanvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .sidebar {
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px 24px 16px;
+            overflow-y: auto;
+            transition: width 0.3s ease, opacity 0.3s ease;
+            display: block; /* Visible in standalone mode */
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 24px 0 16px;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .sidebar h1 {
+            margin: 0 0 8px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .sidebar p {
+            margin: 0 0 20px;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section h2 {
+            font-size: 1rem;
+            margin: 0 0 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #1e293b;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5f5;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .search-hint {
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .list-item strong {
+            font-weight: 600;
+        }
+
+        .cluster-item,
+        .relation-item {
+            border-left: 4px solid transparent;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .cluster-item:hover,
+        .relation-item:hover {
+            background: #e2e8f0;
+        }
+
+        .cluster-item.active,
+        .relation-item.active {
+            transform: translateX(4px);
+            background: #e2e8f0;
+        }
+
+        .cluster-item .meta,
+        .relation-item .meta {
+            font-size: 0.8rem;
+            color: #475569;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            padding: 16px 20px 0;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab {
+            border: none;
+            background: #e2e8f0;
+            color: #1e293b;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .tab.active {
+            background: #1d4ed8;
+            color: #ffffff;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none; /* Hidden when sidebar is disabled */
+        }
+
+        .sidebar-toggle:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .sidebar-toggle::before {
+            content: '☰';
+            margin-right: 6px;
+        }
+
+        .sidebar-toggle.collapsed::before {
+            content: '☰';
+        }
+
+        .tab-panel {
+            flex: 1;
+            display: none;
+            padding: 16px 20px;
+            overflow: hidden;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .network-panel {
+            height: calc(100vh - 74px);
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        #networkCanvas {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+        }
+
+        #networkCanvas {
+            cursor: grab;
+        }
+
+        #networkCanvas:active {
+            cursor: grabbing;
+        }
+
+        .selection-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+
+        .selection-card h3 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+
+        .selection-card ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .selection-card li {
+            margin-bottom: 4px;
+            color: #475569;
+        }
+
+        .table-container {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            height: calc(100vh - 90px);
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: #f8fafc;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            font-size: 0.75rem;
+            color: #0f172a;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .legend-swatch {
+            width: 12px;
+            height: 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(15, 23, 42, 0.25);
+        }
+
+
+        /* Mobile/narrow iframe handling - when sidebar is disabled, use full space */
+        @media (max-width: 800px) {
+            .layout:not(.sidebar-disabled) {
+                grid-template-columns: 1fr;
+            }
+
+            .layout:not(.sidebar-disabled) .sidebar {
+                height: 280px;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .layout:not(.sidebar-disabled) .main {
+                height: calc(100vh - 280px);
+            }
+
+            /* When sidebar is disabled (iframe mode), ensure full viewport usage */
+            .layout.sidebar-disabled .main {
+                width: 100% !important;
+                height: 100vh !important;
+            }
+
+            .layout.sidebar-disabled .tab-panel {
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100vh !important;
+            }
+
+            .layout.sidebar-disabled .network-panel {
+                width: 100% !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+                border: none !important;
+                max-width: none !important;
+            }
+
+            .layout.sidebar-disabled #networkCanvas {
+                width: 100% !important;
+                height: 100vh !important;
+                max-width: none !important;
+            }
+
+            /* Ensure iframe canvas takes full space on mobile */
+            canvas#networkCanvas {
+                width: 100% !important;
+                height: 100% !important;
+                min-width: 100% !important;
+                min-height: 100% !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <h1>Knowledge Graph Explorer</h1>
+            <p>Search, highlight, and inspect entities and relations to understand how the graph fits together.</p>
+            <div class="stats-grid" id="statsGrid"></div>
+            <div class="section">
+                <h2>Search</h2>
+                <input id="searchInput" class="search-input" type="text" placeholder="Search for entities or
+                    relations" />
+                <div class="search-hint">Matches are highlighted. Press Escape to clear.</div>
+            </div>
+            <div class="section" id="selectionSection">
+                <h2>Selection</h2>
+                <div id="selectionDetails" class="selection-card">Click a node or relation in the network to inspect
+                    details.</div>
+            </div>
+            <div class="section">
+                <h2>Entity Clusters</h2>
+                <div id="clusterList" class="list"></div>
+            </div>
+            <div class="section">
+                <h2>Top Entities</h2>
+                <div id="topEntities" class="list"></div>
+            </div>
+            <div class="section">
+                <h2>Top Relations</h2>
+                <div id="topRelations" class="list"></div>
+            </div>
+        </aside>
+        <main class="main">
+            <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar"></button>
+            <div class="tab-bar" style="padding-bottom: 10px; display: none;">
+                <button class="tab active" data-tab="network">Network</button>
+                <!-- <button class="tab" data-tab="relations">Relations</button>
+                <button class="tab" data-tab="insights">Insights</button> -->
+            </div>
+            <section id="network" class="tab-panel active">
+                <div class="network-panel">
+                    <canvas id="networkCanvas"></canvas>
+                </div>
+            </section>
+            <!-- <section id="relations" class="tab-panel">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Relation</th>
+                                <th>Object</th>
+                            </tr>
+                        </thead>
+                        <tbody id="relationsTable"></tbody>
+                    </table>
+                </div>
+            </section>
+            <section id="insights" class="tab-panel">
+                <div class="table-container" style="padding: 20px;">
+                    <div id="insightsContent"></div>
+                </div>
+            </section> -->
+        </main>
+    </div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script id="viz-data" type="application/json">
+{
+  "nodes": [
+    {
+      "id": "101 (whaleback barge)",
+      "label": "101 (whaleback barge)",
+      "cluster": null,
+      "color": "#2cc9ad",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "Thomas Wilson",
+        "whaleback barge"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e42"
+        ],
+        "outgoing": [
+          "e56"
+        ]
+      }
+    },
+    {
+      "id": "115",
+      "label": "115",
+      "cluster": null,
+      "color": "#44da60",
+      "degree": 58,
+      "indegree": 0,
+      "outdegree": 58,
+      "isRepresentative": false,
+      "radius": 34,
+      "neighbors": [
+        "18.75 feet deep",
+        "1893 collision",
+        "1894 collision",
+        "1897 grounding",
+        "256 feet long",
+        "3,000 tons of iron ore",
+        "36 feet wide",
+        "A.D. Thompson",
+        "American Steel Barge Company",
+        "American Steel Barge Company fleet",
+        "American whaleback barge",
+        "Arthur A. Boyce",
+        "Barge 115",
+        "Colgate Hoyt",
+        "cook",
+        "crew of eight",
+        "dry docked in Duluth",
+        "dry docked in West Superior",
+        "Duluth, Minnesota",
+        "enrolled in Duluth",
+        "entered service August 25, 1891",
+        "final shipwreck on the Great Lakes during the 1800s",
+        "Great Lakes",
+        "gross tonnage 1,169 tons",
+        "home port Buffalo",
+        "hull frames",
+        "hull frames laid down May 21, 1891",
+        "hull plates",
+        "iron ore",
+        "keel plates",
+        "Lake Erie",
+        "Lake Superior",
+        "launched August 15, 1891",
+        "life raft",
+        "load of iron ore",
+        "McDougall fleet",
+        "net tonnage 1,110 tons",
+        "No.115",
+        "Pic Island",
+        "Sault Ste. Marie",
+        "second whaleback lost on the Great Lakes",
+        "service period 1891–1899",
+        "small life raft",
+        "Soo Locks",
+        "steam-powered ship (towing)",
+        "storm",
+        "Superior, Wisconsin",
+        "turrets",
+        "Two Harbors, Minnesota",
+        "unrigged barge",
+        "US official number 53268",
+        "West Superior, Wisconsin",
+        "whaleback",
+        "Whaleback 115",
+        "whaleback barge"
+      ],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": [
+          "e0",
+          "e1",
+          "e2",
+          "e9",
+          "e10",
+          "e11",
+          "e12",
+          "e15",
+          "e16",
+          "e22",
+          "e23",
+          "e25",
+          "e26",
+          "e28",
+          "e34",
+          "e35",
+          "e36",
+          "e37",
+          "e38",
+          "e39",
+          "e40",
+          "e41",
+          "e43",
+          "e48",
+          "e49",
+          "e57",
+          "e58",
+          "e59",
+          "e66",
+          "e73",
+          "e88",
+          "e89",
+          "e97",
+          "e98",
+          "e101",
+          "e102",
+          "e103",
+          "e104",
+          "e105",
+          "e106",
+          "e107",
+          "e108",
+          "e110",
+          "e111",
+          "e112",
+          "e113",
+          "e114",
+          "e116",
+          "e117",
+          "e118",
+          "e119",
+          "e120",
+          "e121",
+          "e122",
+          "e124",
+          "e125",
+          "e127",
+          "e128"
+        ]
+      }
+    },
+    {
+      "id": "115 wreck",
+      "label": "115 wreck",
+      "cluster": null,
+      "color": "#86eb75",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "wreck of 115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e70"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "18.75 feet deep",
+      "label": "18.75 feet deep",
+      "cluster": null,
+      "color": "#ece677",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e101"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "1893 collision",
+      "label": "1893 collision",
+      "cluster": null,
+      "color": "#a9df28",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "Thomas Wilson"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e118"
+        ],
+        "outgoing": [
+          "e52"
+        ]
+      }
+    },
+    {
+      "id": "1894 collision",
+      "label": "1894 collision",
+      "cluster": null,
+      "color": "#cc6d47",
+      "degree": 3,
+      "indegree": 1,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 24,
+      "neighbors": [
+        "115",
+        "Lake George",
+        "Mesaba (steamer)"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e119"
+        ],
+        "outgoing": [
+          "e53",
+          "e83"
+        ]
+      }
+    },
+    {
+      "id": "1897 grounding",
+      "label": "1897 grounding",
+      "cluster": null,
+      "color": "#e4837e",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "St. Marys River"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e120"
+        ],
+        "outgoing": [
+          "e84"
+        ]
+      }
+    },
+    {
+      "id": "256 feet long",
+      "label": "256 feet long",
+      "cluster": null,
+      "color": "#60dec2",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e102"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "3,000 tons of iron ore",
+      "label": "3,000 tons of iron ore",
+      "cluster": null,
+      "color": "#5465e7",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "iron ore"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e73"
+        ],
+        "outgoing": [
+          "e54"
+        ]
+      }
+    },
+    {
+      "id": "36 feet wide",
+      "label": "36 feet wide",
+      "cluster": null,
+      "color": "#78d4e4",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e103"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "48.69806°N",
+      "label": "48.69806°N",
+      "cluster": null,
+      "color": "#88e372",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "coordinates 48°41′53″N 86°39′17″W"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e72"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "86.65472°W",
+      "label": "86.65472°W",
+      "cluster": null,
+      "color": "#62e5ce",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "coordinates 48°41′53″N 86°39′17″W"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e76"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "A.D. Thompson",
+      "label": "A.D. Thompson",
+      "cluster": null,
+      "color": "#3023d6",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "whaleback steamer"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e128"
+        ],
+        "outgoing": [
+          "e60"
+        ]
+      }
+    },
+    {
+      "id": "Alexander McDougall",
+      "label": "Alexander McDougall",
+      "cluster": null,
+      "color": "#57e3e4",
+      "degree": 9,
+      "indegree": 2,
+      "outdegree": 7,
+      "isRepresentative": false,
+      "radius": 34,
+      "neighbors": [
+        "American Steel Barge Company",
+        "Charles W. Wetmore",
+        "Christopher Columbus (excursion liner)",
+        "entrepreneur",
+        "Great Lakes captain",
+        "inventor",
+        "Scottish immigrant",
+        "shipbuilders",
+        "whaleback ship design"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e24",
+          "e32"
+        ],
+        "outgoing": [
+          "e61",
+          "e62",
+          "e67",
+          "e68",
+          "e87",
+          "e90",
+          "e126"
+        ]
+      }
+    },
+    {
+      "id": "American Steel Barge Company",
+      "label": "American Steel Barge Company",
+      "cluster": null,
+      "color": "#66ebc4",
+      "degree": 3,
+      "indegree": 1,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 24,
+      "neighbors": [
+        "115",
+        "Alexander McDougall",
+        "Superior, Wisconsin"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e111"
+        ],
+        "outgoing": [
+          "e32",
+          "e33"
+        ]
+      }
+    },
+    {
+      "id": "American Steel Barge Company fleet",
+      "label": "American Steel Barge Company fleet",
+      "cluster": null,
+      "color": "#471adc",
+      "degree": 3,
+      "indegree": 2,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 24,
+      "neighbors": [
+        "115",
+        "Buffalo, New York",
+        "Pickands Mather & Company"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e96",
+          "e122"
+        ],
+        "outgoing": [
+          "e5"
+        ]
+      }
+    },
+    {
+      "id": "American whaleback barge",
+      "label": "American whaleback barge",
+      "cluster": null,
+      "color": "#33ee8f",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e57"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Arthur A. Boyce",
+      "label": "Arthur A. Boyce",
+      "cluster": null,
+      "color": "#3ce0c7",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "Captain Boyce"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e127"
+        ],
+        "outgoing": [
+          "e55"
+        ]
+      }
+    },
+    {
+      "id": "Barge 115",
+      "label": "Barge 115",
+      "cluster": null,
+      "color": "#21e5b9",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e0"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "bell",
+      "label": "bell",
+      "cluster": null,
+      "color": "#17e857",
+      "degree": 1,
+      "indegree": 0,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "wreck of 115"
+      ],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": [
+          "e123"
+        ]
+      }
+    },
+    {
+      "id": "bow",
+      "label": "bow",
+      "cluster": null,
+      "color": "#e24868",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "The 100 Best Great Lakes Shipwrecks – Volume II"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e29"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "bread (two loaves)",
+      "label": "bread (two loaves)",
+      "cluster": null,
+      "color": "#bcb132",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e17"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Buffalo, New York",
+      "label": "Buffalo, New York",
+      "cluster": null,
+      "color": "#d483db",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "American Steel Barge Company fleet",
+        "McDougall fleet"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e5",
+          "e6"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Canadian Pacific Railway",
+      "label": "Canadian Pacific Railway",
+      "cluster": null,
+      "color": "#923dd4",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "Canadian Pacific Railway track",
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e8",
+          "e130"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Canadian Pacific Railway track",
+      "label": "Canadian Pacific Railway track",
+      "cluster": null,
+      "color": "#7e6ad3",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "Canadian Pacific Railway",
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e94"
+        ],
+        "outgoing": [
+          "e8"
+        ]
+      }
+    },
+    {
+      "id": "candles",
+      "label": "candles",
+      "cluster": null,
+      "color": "#59d8c8",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e18"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Captain Boyce",
+      "label": "Captain Boyce",
+      "cluster": null,
+      "color": "#66dbe9",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Arthur A. Boyce"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e55"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Charles W. Wetmore",
+      "label": "Charles W. Wetmore",
+      "cluster": null,
+      "color": "#9cf064",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "Alexander McDougall",
+        "London"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e90"
+        ],
+        "outgoing": [
+          "e91"
+        ]
+      }
+    },
+    {
+      "id": "Christmas",
+      "label": "Christmas",
+      "cluster": null,
+      "color": "#e23fe4",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e78"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Christopher Columbus (excursion liner)",
+      "label": "Christopher Columbus (excursion liner)",
+      "cluster": null,
+      "color": "#e61c5f",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Alexander McDougall"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e87"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "City of Everett",
+      "label": "City of Everett",
+      "cluster": null,
+      "color": "#d63c9e",
+      "degree": 1,
+      "indegree": 0,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Everett, Washington"
+      ],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": [
+          "e13"
+        ]
+      }
+    },
+    {
+      "id": "Cleveland, Ohio",
+      "label": "Cleveland, Ohio",
+      "cluster": null,
+      "color": "#25e7a5",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Pickands Mather & Company"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e7"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "cliff",
+      "label": "cliff",
+      "cluster": null,
+      "color": "#4a7bcd",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "twisted steel plates"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e74"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Colgate Hoyt",
+      "label": "Colgate Hoyt",
+      "cluster": null,
+      "color": "#3de2a6",
+      "degree": 6,
+      "indegree": 2,
+      "outdegree": 4,
+      "isRepresentative": false,
+      "radius": 30,
+      "neighbors": [
+        "115",
+        "fuel scarcity",
+        "Sault Ste. Marie",
+        "tugboats",
+        "whaleback freighter"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e11",
+          "e117"
+        ],
+        "outgoing": [
+          "e27",
+          "e63",
+          "e85",
+          "e86"
+        ]
+      }
+    },
+    {
+      "id": "conoidal ends",
+      "label": "conoidal ends",
+      "cluster": null,
+      "color": "#2d79c0",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "whaleback"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e44"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "cook",
+      "label": "cook",
+      "cluster": null,
+      "color": "#cde94a",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "frostbitten feet"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e34"
+        ],
+        "outgoing": [
+          "e95"
+        ]
+      }
+    },
+    {
+      "id": "coordinates 48°41′53″N 86°39′17″W",
+      "label": "coordinates 48°41′53″N 86°39′17″W",
+      "cluster": null,
+      "color": "#df48d2",
+      "degree": 3,
+      "indegree": 1,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 24,
+      "neighbors": [
+        "48.69806°N",
+        "86.65472°W",
+        "wreck of 115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e47"
+        ],
+        "outgoing": [
+          "e72",
+          "e76"
+        ]
+      }
+    },
+    {
+      "id": "crew of eight",
+      "label": "crew of eight",
+      "cluster": null,
+      "color": "#4edf96",
+      "degree": 12,
+      "indegree": 1,
+      "outdegree": 11,
+      "isRepresentative": false,
+      "radius": 34,
+      "neighbors": [
+        "115",
+        "bread (two loaves)",
+        "Canadian Pacific Railway",
+        "Canadian Pacific Railway track",
+        "candles",
+        "Christmas",
+        "grease",
+        "ham",
+        "log cabin",
+        "makeshift raft",
+        "Middletown, Ontario",
+        "tree branches"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e39"
+        ],
+        "outgoing": [
+          "e17",
+          "e18",
+          "e19",
+          "e20",
+          "e77",
+          "e78",
+          "e79",
+          "e94",
+          "e99",
+          "e100",
+          "e130"
+        ]
+      }
+    },
+    {
+      "id": "depth between 40 and 80 feet (12.2–24.4 m)",
+      "label": "depth between 40 and 80 feet (12.2–24.4 m)",
+      "cluster": null,
+      "color": "#d85ba4",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "wreck of 115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e4"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "dive footage (about 1980)",
+      "label": "dive footage (about 1980)",
+      "cluster": null,
+      "color": "#9281de",
+      "degree": 2,
+      "indegree": 0,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "stern",
+        "turrets"
+      ],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": [
+          "e92",
+          "e93"
+        ]
+      }
+    },
+    {
+      "id": "dry docked in Duluth",
+      "label": "dry docked in Duluth",
+      "cluster": null,
+      "color": "#63e059",
+      "degree": 3,
+      "indegree": 1,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 24,
+      "neighbors": [
+        "115",
+        "Duluth, Minnesota",
+        "repairs"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e104"
+        ],
+        "outgoing": [
+          "e30",
+          "e81"
+        ]
+      }
+    },
+    {
+      "id": "dry docked in West Superior",
+      "label": "dry docked in West Superior",
+      "cluster": null,
+      "color": "#2655cb",
+      "degree": 3,
+      "indegree": 1,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 24,
+      "neighbors": [
+        "115",
+        "repairs",
+        "West Superior, Wisconsin"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e105"
+        ],
+        "outgoing": [
+          "e31",
+          "e82"
+        ]
+      }
+    },
+    {
+      "id": "Duluth, Minnesota",
+      "label": "Duluth, Minnesota",
+      "cluster": null,
+      "color": "#65cbec",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "dry docked in Duluth"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e81",
+          "e116"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "enrolled in Duluth",
+      "label": "enrolled in Duluth",
+      "cluster": null,
+      "color": "#edbe75",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e106"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "entered service August 25, 1891",
+      "label": "entered service August 25, 1891",
+      "cluster": null,
+      "color": "#cb5bf0",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e28"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "entrepreneur",
+      "label": "entrepreneur",
+      "cluster": null,
+      "color": "#4279de",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Alexander McDougall"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e67"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Everett, Washington",
+      "label": "Everett, Washington",
+      "cluster": null,
+      "color": "#c9de81",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "City of Everett"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e13"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "final shipwreck on the Great Lakes during the 1800s",
+      "label": "final shipwreck on the Great Lakes during the 1800s",
+      "cluster": null,
+      "color": "#e07be3",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e107"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "final trip of the shipping season",
+      "label": "final trip of the shipping season",
+      "cluster": null,
+      "color": "#45cb65",
+      "degree": 0,
+      "indegree": 0,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 18,
+      "neighbors": [],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "frostbitten feet",
+      "label": "frostbitten feet",
+      "cluster": null,
+      "color": "#d01fc9",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "cook"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e95"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "fuel scarcity",
+      "label": "fuel scarcity",
+      "cluster": null,
+      "color": "#c2ec50",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Colgate Hoyt"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e85"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "grease",
+      "label": "grease",
+      "cluster": null,
+      "color": "#40cb92",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e19"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Great Lakes",
+      "label": "Great Lakes",
+      "cluster": null,
+      "color": "#4ddf42",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e66"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Great Lakes captain",
+      "label": "Great Lakes captain",
+      "cluster": null,
+      "color": "#5086e8",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Alexander McDougall"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e61"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "gross tonnage 1,169 tons",
+      "label": "gross tonnage 1,169 tons",
+      "cluster": null,
+      "color": "#7ddd57",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e35"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "ham",
+      "label": "ham",
+      "cluster": null,
+      "color": "#25c766",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e20"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "home port Buffalo",
+      "label": "home port Buffalo",
+      "cluster": null,
+      "color": "#b91fcb",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e40"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "hull frames",
+      "label": "hull frames",
+      "cluster": null,
+      "color": "#2aa7cb",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e41"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "hull frames laid down May 21, 1891",
+      "label": "hull frames laid down May 21, 1891",
+      "cluster": null,
+      "color": "#8dd86b",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e36"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "hull plates",
+      "label": "hull plates",
+      "cluster": null,
+      "color": "#63e2ab",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e10",
+          "e88"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "inventor",
+      "label": "inventor",
+      "cluster": null,
+      "color": "#e81414",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Alexander McDougall"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e68"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "iron ore",
+      "label": "iron ore",
+      "cluster": null,
+      "color": "#e9493c",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "3,000 tons of iron ore"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e15",
+          "e54"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "keel plates",
+      "label": "keel plates",
+      "cluster": null,
+      "color": "#63e889",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e89"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Lake Erie",
+      "label": "Lake Erie",
+      "cluster": null,
+      "color": "#598cd1",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e9"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Lake George",
+      "label": "Lake George",
+      "cluster": null,
+      "color": "#67dcbf",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "1894 collision"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e83"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Lake Superior",
+      "label": "Lake Superior",
+      "cluster": null,
+      "color": "#e875b9",
+      "degree": 3,
+      "indegree": 3,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 24,
+      "neighbors": [
+        "115",
+        "Pic Island"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e12",
+          "e25",
+          "e51"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "launched August 15, 1891",
+      "label": "launched August 15, 1891",
+      "cluster": null,
+      "color": "#453de9",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e108"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "life raft",
+      "label": "life raft",
+      "cluster": null,
+      "color": "#3139e8",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e97"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "load of iron ore",
+      "label": "load of iron ore",
+      "cluster": null,
+      "color": "#3e37cc",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e16"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "log cabin",
+      "label": "log cabin",
+      "cluster": null,
+      "color": "#be5c36",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "crew of eight",
+        "stove"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e99"
+        ],
+        "outgoing": [
+          "e21"
+        ]
+      }
+    },
+    {
+      "id": "London",
+      "label": "London",
+      "cluster": null,
+      "color": "#45ef91",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Charles W. Wetmore"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e91"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "makeshift raft",
+      "label": "makeshift raft",
+      "cluster": null,
+      "color": "#b75ad5",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e77"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Marathon, Ontario",
+      "label": "Marathon, Ontario",
+      "cluster": null,
+      "color": "#6bd581",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "Ontario",
+        "Pic Island"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e80"
+        ],
+        "outgoing": [
+          "e50"
+        ]
+      }
+    },
+    {
+      "id": "maritime historian Cris Kohl",
+      "label": "maritime historian Cris Kohl",
+      "cluster": null,
+      "color": "#7098e2",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "The 100 Best Great Lakes Shipwrecks – Volume II"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e14"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "McDougall fleet",
+      "label": "McDougall fleet",
+      "cluster": null,
+      "color": "#7655f0",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "Buffalo, New York"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e112"
+        ],
+        "outgoing": [
+          "e6"
+        ]
+      }
+    },
+    {
+      "id": "Mesaba (steamer)",
+      "label": "Mesaba (steamer)",
+      "cluster": null,
+      "color": "#d840cf",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "1894 collision",
+        "steam-powered ship (towing)"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e53"
+        ],
+        "outgoing": [
+          "e64"
+        ]
+      }
+    },
+    {
+      "id": "Middletown, Ontario",
+      "label": "Middletown, Ontario",
+      "cluster": null,
+      "color": "#9f21e7",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e79"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "net tonnage 1,110 tons",
+      "label": "net tonnage 1,110 tons",
+      "cluster": null,
+      "color": "#5fd17f",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e37"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "No.115",
+      "label": "No.115",
+      "cluster": null,
+      "color": "#37da87",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e1"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Ontario",
+      "label": "Ontario",
+      "cluster": null,
+      "color": "#54d6ee",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Marathon, Ontario"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e50"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Pic Island",
+      "label": "Pic Island",
+      "cluster": null,
+      "color": "#313dda",
+      "degree": 4,
+      "indegree": 2,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 26,
+      "neighbors": [
+        "115",
+        "Lake Superior",
+        "Marathon, Ontario",
+        "twisted steel plates"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e3",
+          "e22"
+        ],
+        "outgoing": [
+          "e51",
+          "e80"
+        ]
+      }
+    },
+    {
+      "id": "Pickands Mather & Company",
+      "label": "Pickands Mather & Company",
+      "cluster": null,
+      "color": "#e9ea51",
+      "degree": 2,
+      "indegree": 0,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "American Steel Barge Company fleet",
+        "Cleveland, Ohio"
+      ],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": [
+          "e7",
+          "e96"
+        ]
+      }
+    },
+    {
+      "id": "pig boats",
+      "label": "pig boats",
+      "cluster": null,
+      "color": "#d6c615",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "whaleback"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e129"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "repairs",
+      "label": "repairs",
+      "cluster": null,
+      "color": "#e8401e",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "dry docked in Duluth",
+        "dry docked in West Superior"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e30",
+          "e31"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "rock bottom",
+      "label": "rock bottom",
+      "cluster": null,
+      "color": "#32ca67",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "wreck of 115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e75"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "rounded decks",
+      "label": "rounded decks",
+      "cluster": null,
+      "color": "#d551ed",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "whaleback"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e45"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "rounded hull shapes",
+      "label": "rounded hull shapes",
+      "cluster": null,
+      "color": "#7bdcbb",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "whaleback"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e46"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Sault Ste. Marie",
+      "label": "Sault Ste. Marie",
+      "cluster": null,
+      "color": "#625fd2",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "Colgate Hoyt"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e86",
+          "e121"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Sault Ste. Marie Canal",
+      "label": "Sault Ste. Marie Canal",
+      "cluster": null,
+      "color": "#69e372",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "St. Marys River"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e69"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Scottish immigrant",
+      "label": "Scottish immigrant",
+      "cluster": null,
+      "color": "#36d6ab",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Alexander McDougall"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e62"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "second whaleback lost on the Great Lakes",
+      "label": "second whaleback lost on the Great Lakes",
+      "cluster": null,
+      "color": "#78e933",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e124"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "service period 1891–1899",
+      "label": "service period 1891–1899",
+      "cluster": null,
+      "color": "#db8387",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e48"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "shipbuilders",
+      "label": "shipbuilders",
+      "cluster": null,
+      "color": "#e4f065",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Alexander McDougall"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e126"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "small life raft",
+      "label": "small life raft",
+      "cluster": null,
+      "color": "#deab6a",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e98"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Soo Locks",
+      "label": "Soo Locks",
+      "cluster": null,
+      "color": "#18bad2",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e49"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "St. Marys River",
+      "label": "St. Marys River",
+      "cluster": null,
+      "color": "#aad851",
+      "degree": 2,
+      "indegree": 1,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "1897 grounding",
+        "Sault Ste. Marie Canal"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e84"
+        ],
+        "outgoing": [
+          "e69"
+        ]
+      }
+    },
+    {
+      "id": "steam-powered ship (towing)",
+      "label": "steam-powered ship (towing)",
+      "cluster": null,
+      "color": "#25c35d",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "Mesaba (steamer)"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e64",
+          "e125"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "stern",
+      "label": "stern",
+      "cluster": null,
+      "color": "#5ad15a",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "dive footage (about 1980)"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e92"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "storm",
+      "label": "storm",
+      "cluster": null,
+      "color": "#8921ea",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e26"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "stove",
+      "label": "stove",
+      "cluster": null,
+      "color": "#49d44d",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "log cabin"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e21"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "Superior, Wisconsin",
+      "label": "Superior, Wisconsin",
+      "cluster": null,
+      "color": "#d75291",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "American Steel Barge Company"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e33",
+          "e113"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "The 100 Best Great Lakes Shipwrecks – Volume II",
+      "label": "The 100 Best Great Lakes Shipwrecks – Volume II",
+      "cluster": null,
+      "color": "#d75598",
+      "degree": 2,
+      "indegree": 0,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "bow",
+        "maritime historian Cris Kohl"
+      ],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": [
+          "e14",
+          "e29"
+        ]
+      }
+    },
+    {
+      "id": "Thomas Wilson",
+      "label": "Thomas Wilson",
+      "cluster": null,
+      "color": "#812ebc",
+      "degree": 3,
+      "indegree": 1,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 24,
+      "neighbors": [
+        "101 (whaleback barge)",
+        "1893 collision",
+        "whaleback freighter"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e52"
+        ],
+        "outgoing": [
+          "e42",
+          "e65"
+        ]
+      }
+    },
+    {
+      "id": "tree branches",
+      "label": "tree branches",
+      "cluster": null,
+      "color": "#54d029",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "crew of eight"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e100"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "tugboats",
+      "label": "tugboats",
+      "cluster": null,
+      "color": "#f16d6d",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Colgate Hoyt"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e27"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "turrets",
+      "label": "turrets",
+      "cluster": null,
+      "color": "#8f6eed",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "dive footage (about 1980)"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e38",
+          "e93"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "twisted steel plates",
+      "label": "twisted steel plates",
+      "cluster": null,
+      "color": "#db1fe7",
+      "degree": 2,
+      "indegree": 0,
+      "outdegree": 2,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "cliff",
+        "Pic Island"
+      ],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": [
+          "e3",
+          "e74"
+        ]
+      }
+    },
+    {
+      "id": "Two Harbors, Minnesota",
+      "label": "Two Harbors, Minnesota",
+      "cluster": null,
+      "color": "#425bd8",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e23"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "unrigged barge",
+      "label": "unrigged barge",
+      "cluster": null,
+      "color": "#deb376",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e110"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "US official number 53268",
+      "label": "US official number 53268",
+      "cluster": null,
+      "color": "#bfe072",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e43"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "vertical sides (traditional freighters)",
+      "label": "vertical sides (traditional freighters)",
+      "cluster": null,
+      "color": "#6ad855",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "whaleback"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e71"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "West Superior, Wisconsin",
+      "label": "West Superior, Wisconsin",
+      "cluster": null,
+      "color": "#a0e667",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "115",
+        "dry docked in West Superior"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e82",
+          "e114"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "whaleback",
+      "label": "whaleback",
+      "cluster": null,
+      "color": "#30c16a",
+      "degree": 6,
+      "indegree": 1,
+      "outdegree": 5,
+      "isRepresentative": false,
+      "radius": 30,
+      "neighbors": [
+        "115",
+        "conoidal ends",
+        "pig boats",
+        "rounded decks",
+        "rounded hull shapes",
+        "vertical sides (traditional freighters)"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e58"
+        ],
+        "outgoing": [
+          "e44",
+          "e45",
+          "e46",
+          "e71",
+          "e129"
+        ]
+      }
+    },
+    {
+      "id": "Whaleback 115",
+      "label": "Whaleback 115",
+      "cluster": null,
+      "color": "#67ebed",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e2"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "whaleback barge",
+      "label": "whaleback barge",
+      "cluster": null,
+      "color": "#3ee29b",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "101 (whaleback barge)",
+        "115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e56",
+          "e59"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "whaleback freighter",
+      "label": "whaleback freighter",
+      "cluster": null,
+      "color": "#9631dc",
+      "degree": 2,
+      "indegree": 2,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 22,
+      "neighbors": [
+        "Colgate Hoyt",
+        "Thomas Wilson"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e63",
+          "e65"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "whaleback ship design",
+      "label": "whaleback ship design",
+      "cluster": null,
+      "color": "#52cdd2",
+      "degree": 1,
+      "indegree": 0,
+      "outdegree": 1,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "Alexander McDougall"
+      ],
+      "edgeIds": {
+        "incoming": [],
+        "outgoing": [
+          "e24"
+        ]
+      }
+    },
+    {
+      "id": "whaleback steamer",
+      "label": "whaleback steamer",
+      "cluster": null,
+      "color": "#eb6a60",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "A.D. Thompson"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e60"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "wreck hunter Ryan LeBlanc",
+      "label": "wreck hunter Ryan LeBlanc",
+      "cluster": null,
+      "color": "#44e817",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "wreck of 115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e115"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "wreck located in 1980",
+      "label": "wreck located in 1980",
+      "cluster": null,
+      "color": "#5cd87c",
+      "degree": 1,
+      "indegree": 1,
+      "outdegree": 0,
+      "isRepresentative": false,
+      "radius": 20,
+      "neighbors": [
+        "wreck of 115"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e109"
+        ],
+        "outgoing": []
+      }
+    },
+    {
+      "id": "wreck of 115",
+      "label": "wreck of 115",
+      "cluster": null,
+      "color": "#313fc0",
+      "degree": 7,
+      "indegree": 1,
+      "outdegree": 6,
+      "isRepresentative": false,
+      "radius": 32,
+      "neighbors": [
+        "115 wreck",
+        "bell",
+        "coordinates 48°41′53″N 86°39′17″W",
+        "depth between 40 and 80 feet (12.2–24.4 m)",
+        "rock bottom",
+        "wreck hunter Ryan LeBlanc",
+        "wreck located in 1980"
+      ],
+      "edgeIds": {
+        "incoming": [
+          "e123"
+        ],
+        "outgoing": [
+          "e4",
+          "e47",
+          "e70",
+          "e75",
+          "e109",
+          "e115"
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "source": "115",
+      "target": "Barge 115",
+      "predicate": "also known as",
+      "cluster": null,
+      "color": "#df9c5a",
+      "tooltip": "115 —also known as→ Barge 115"
+    },
+    {
+      "id": "e1",
+      "source": "115",
+      "target": "No.115",
+      "predicate": "also known as",
+      "cluster": null,
+      "color": "#df9c5a",
+      "tooltip": "115 —also known as→ No.115"
+    },
+    {
+      "id": "e2",
+      "source": "115",
+      "target": "Whaleback 115",
+      "predicate": "also known as",
+      "cluster": null,
+      "color": "#df9c5a",
+      "tooltip": "115 —also known as→ Whaleback 115"
+    },
+    {
+      "id": "e3",
+      "source": "twisted steel plates",
+      "target": "Pic Island",
+      "predicate": "associated with wrecking at",
+      "cluster": null,
+      "color": "#60db2a",
+      "tooltip": "twisted steel plates —associated with wrecking at→ Pic Island"
+    },
+    {
+      "id": "e4",
+      "source": "wreck of 115",
+      "target": "depth between 40 and 80 feet (12.2–24.4 m)",
+      "predicate": "at",
+      "cluster": null,
+      "color": "#ca82df",
+      "tooltip": "wreck of 115 —at→ depth between 40 and 80 feet (12.2–24.4 m)"
+    },
+    {
+      "id": "e5",
+      "source": "American Steel Barge Company fleet",
+      "target": "Buffalo, New York",
+      "predicate": "based in",
+      "cluster": null,
+      "color": "#808de2",
+      "tooltip": "American Steel Barge Company fleet —based in→ Buffalo, New York"
+    },
+    {
+      "id": "e6",
+      "source": "McDougall fleet",
+      "target": "Buffalo, New York",
+      "predicate": "based in",
+      "cluster": null,
+      "color": "#808de2",
+      "tooltip": "McDougall fleet —based in→ Buffalo, New York"
+    },
+    {
+      "id": "e7",
+      "source": "Pickands Mather & Company",
+      "target": "Cleveland, Ohio",
+      "predicate": "based in",
+      "cluster": null,
+      "color": "#808de2",
+      "tooltip": "Pickands Mather & Company —based in→ Cleveland, Ohio"
+    },
+    {
+      "id": "e8",
+      "source": "Canadian Pacific Railway track",
+      "target": "Canadian Pacific Railway",
+      "predicate": "belongs to",
+      "cluster": null,
+      "color": "#63f09c",
+      "tooltip": "Canadian Pacific Railway track —belongs to→ Canadian Pacific Railway"
+    },
+    {
+      "id": "e9",
+      "source": "115",
+      "target": "Lake Erie",
+      "predicate": "bound for",
+      "cluster": null,
+      "color": "#37d6e5",
+      "tooltip": "115 —bound for→ Lake Erie"
+    },
+    {
+      "id": "e10",
+      "source": "115",
+      "target": "hull plates",
+      "predicate": "broke",
+      "cluster": null,
+      "color": "#dc8256",
+      "tooltip": "115 —broke→ hull plates"
+    },
+    {
+      "id": "e11",
+      "source": "115",
+      "target": "Colgate Hoyt",
+      "predicate": "broke away from",
+      "cluster": null,
+      "color": "#d14e44",
+      "tooltip": "115 —broke away from→ Colgate Hoyt"
+    },
+    {
+      "id": "e12",
+      "source": "115",
+      "target": "Lake Superior",
+      "predicate": "broke away on",
+      "cluster": null,
+      "color": "#1db0cf",
+      "tooltip": "115 —broke away on→ Lake Superior"
+    },
+    {
+      "id": "e13",
+      "source": "City of Everett",
+      "target": "Everett, Washington",
+      "predicate": "built in",
+      "cluster": null,
+      "color": "#5fa4eb",
+      "tooltip": "City of Everett —built in→ Everett, Washington"
+    },
+    {
+      "id": "e14",
+      "source": "The 100 Best Great Lakes Shipwrecks – Volume II",
+      "target": "maritime historian Cris Kohl",
+      "predicate": "by",
+      "cluster": null,
+      "color": "#97e671",
+      "tooltip": "The 100 Best Great Lakes Shipwrecks – Volume II —by→ maritime historian Cris Kohl"
+    },
+    {
+      "id": "e15",
+      "source": "115",
+      "target": "iron ore",
+      "predicate": "carried",
+      "cluster": null,
+      "color": "#3261e6",
+      "tooltip": "115 —carried→ iron ore"
+    },
+    {
+      "id": "e16",
+      "source": "115",
+      "target": "load of iron ore",
+      "predicate": "carried",
+      "cluster": null,
+      "color": "#3261e6",
+      "tooltip": "115 —carried→ load of iron ore"
+    },
+    {
+      "id": "e17",
+      "source": "crew of eight",
+      "target": "bread (two loaves)",
+      "predicate": "carried",
+      "cluster": null,
+      "color": "#3261e6",
+      "tooltip": "crew of eight —carried→ bread (two loaves)"
+    },
+    {
+      "id": "e18",
+      "source": "crew of eight",
+      "target": "candles",
+      "predicate": "carried",
+      "cluster": null,
+      "color": "#3261e6",
+      "tooltip": "crew of eight —carried→ candles"
+    },
+    {
+      "id": "e19",
+      "source": "crew of eight",
+      "target": "grease",
+      "predicate": "carried",
+      "cluster": null,
+      "color": "#3261e6",
+      "tooltip": "crew of eight —carried→ grease"
+    },
+    {
+      "id": "e20",
+      "source": "crew of eight",
+      "target": "ham",
+      "predicate": "carried",
+      "cluster": null,
+      "color": "#3261e6",
+      "tooltip": "crew of eight —carried→ ham"
+    },
+    {
+      "id": "e21",
+      "source": "log cabin",
+      "target": "stove",
+      "predicate": "contained",
+      "cluster": null,
+      "color": "#38d080",
+      "tooltip": "log cabin —contained→ stove"
+    },
+    {
+      "id": "e22",
+      "source": "115",
+      "target": "Pic Island",
+      "predicate": "crashed into",
+      "cluster": null,
+      "color": "#76ebc3",
+      "tooltip": "115 —crashed into→ Pic Island"
+    },
+    {
+      "id": "e23",
+      "source": "115",
+      "target": "Two Harbors, Minnesota",
+      "predicate": "departed from",
+      "cluster": null,
+      "color": "#41e79b",
+      "tooltip": "115 —departed from→ Two Harbors, Minnesota"
+    },
+    {
+      "id": "e24",
+      "source": "whaleback ship design",
+      "target": "Alexander McDougall",
+      "predicate": "designed by",
+      "cluster": null,
+      "color": "#735fd8",
+      "tooltip": "whaleback ship design —designed by→ Alexander McDougall"
+    },
+    {
+      "id": "e25",
+      "source": "115",
+      "target": "Lake Superior",
+      "predicate": "drifted on",
+      "cluster": null,
+      "color": "#566ed6",
+      "tooltip": "115 —drifted on→ Lake Superior"
+    },
+    {
+      "id": "e26",
+      "source": "115",
+      "target": "storm",
+      "predicate": "encountered",
+      "cluster": null,
+      "color": "#c63737",
+      "tooltip": "115 —encountered→ storm"
+    },
+    {
+      "id": "e27",
+      "source": "Colgate Hoyt",
+      "target": "tugboats",
+      "predicate": "enlisted",
+      "cluster": null,
+      "color": "#d7596b",
+      "tooltip": "Colgate Hoyt —enlisted→ tugboats"
+    },
+    {
+      "id": "e28",
+      "source": "115",
+      "target": "entered service August 25, 1891",
+      "predicate": "entered service",
+      "cluster": null,
+      "color": "#13d673",
+      "tooltip": "115 —entered service→ entered service August 25, 1891"
+    },
+    {
+      "id": "e29",
+      "source": "The 100 Best Great Lakes Shipwrecks – Volume II",
+      "target": "bow",
+      "predicate": "erroneously states intact",
+      "cluster": null,
+      "color": "#ee5991",
+      "tooltip": "The 100 Best Great Lakes Shipwrecks – Volume II —erroneously states intact→ bow"
+    },
+    {
+      "id": "e30",
+      "source": "dry docked in Duluth",
+      "target": "repairs",
+      "predicate": "for",
+      "cluster": null,
+      "color": "#d89e70",
+      "tooltip": "dry docked in Duluth —for→ repairs"
+    },
+    {
+      "id": "e31",
+      "source": "dry docked in West Superior",
+      "target": "repairs",
+      "predicate": "for",
+      "cluster": null,
+      "color": "#d89e70",
+      "tooltip": "dry docked in West Superior —for→ repairs"
+    },
+    {
+      "id": "e32",
+      "source": "American Steel Barge Company",
+      "target": "Alexander McDougall",
+      "predicate": "founded by",
+      "cluster": null,
+      "color": "#e56275",
+      "tooltip": "American Steel Barge Company —founded by→ Alexander McDougall"
+    },
+    {
+      "id": "e33",
+      "source": "American Steel Barge Company",
+      "target": "Superior, Wisconsin",
+      "predicate": "founded in",
+      "cluster": null,
+      "color": "#c9a836",
+      "tooltip": "American Steel Barge Company —founded in→ Superior, Wisconsin"
+    },
+    {
+      "id": "e34",
+      "source": "115",
+      "target": "cook",
+      "predicate": "had",
+      "cluster": null,
+      "color": "#e2b51a",
+      "tooltip": "115 —had→ cook"
+    },
+    {
+      "id": "e35",
+      "source": "115",
+      "target": "gross tonnage 1,169 tons",
+      "predicate": "had",
+      "cluster": null,
+      "color": "#e2b51a",
+      "tooltip": "115 —had→ gross tonnage 1,169 tons"
+    },
+    {
+      "id": "e36",
+      "source": "115",
+      "target": "hull frames laid down May 21, 1891",
+      "predicate": "had",
+      "cluster": null,
+      "color": "#e2b51a",
+      "tooltip": "115 —had→ hull frames laid down May 21, 1891"
+    },
+    {
+      "id": "e37",
+      "source": "115",
+      "target": "net tonnage 1,110 tons",
+      "predicate": "had",
+      "cluster": null,
+      "color": "#e2b51a",
+      "tooltip": "115 —had→ net tonnage 1,110 tons"
+    },
+    {
+      "id": "e38",
+      "source": "115",
+      "target": "turrets",
+      "predicate": "had",
+      "cluster": null,
+      "color": "#e2b51a",
+      "tooltip": "115 —had→ turrets"
+    },
+    {
+      "id": "e39",
+      "source": "115",
+      "target": "crew of eight",
+      "predicate": "had complement",
+      "cluster": null,
+      "color": "#1a3adc",
+      "tooltip": "115 —had complement→ crew of eight"
+    },
+    {
+      "id": "e40",
+      "source": "115",
+      "target": "home port Buffalo",
+      "predicate": "had home port",
+      "cluster": null,
+      "color": "#70d7af",
+      "tooltip": "115 —had home port→ home port Buffalo"
+    },
+    {
+      "id": "e41",
+      "source": "115",
+      "target": "hull frames",
+      "predicate": "had hull frames",
+      "cluster": null,
+      "color": "#eb4794",
+      "tooltip": "115 —had hull frames→ hull frames"
+    },
+    {
+      "id": "e42",
+      "source": "Thomas Wilson",
+      "target": "101 (whaleback barge)",
+      "predicate": "had in tow",
+      "cluster": null,
+      "color": "#ee6979",
+      "tooltip": "Thomas Wilson —had in tow→ 101 (whaleback barge)"
+    },
+    {
+      "id": "e43",
+      "source": "115",
+      "target": "US official number 53268",
+      "predicate": "had US official number",
+      "cluster": null,
+      "color": "#ec841e",
+      "tooltip": "115 —had US official number→ US official number 53268"
+    },
+    {
+      "id": "e44",
+      "source": "whaleback",
+      "target": "conoidal ends",
+      "predicate": "has",
+      "cluster": null,
+      "color": "#e1ce4f",
+      "tooltip": "whaleback —has→ conoidal ends"
+    },
+    {
+      "id": "e45",
+      "source": "whaleback",
+      "target": "rounded decks",
+      "predicate": "has",
+      "cluster": null,
+      "color": "#e1ce4f",
+      "tooltip": "whaleback —has→ rounded decks"
+    },
+    {
+      "id": "e46",
+      "source": "whaleback",
+      "target": "rounded hull shapes",
+      "predicate": "has",
+      "cluster": null,
+      "color": "#e1ce4f",
+      "tooltip": "whaleback —has→ rounded hull shapes"
+    },
+    {
+      "id": "e47",
+      "source": "wreck of 115",
+      "target": "coordinates 48°41′53″N 86°39′17″W",
+      "predicate": "has coordinates",
+      "cluster": null,
+      "color": "#7a34d9",
+      "tooltip": "wreck of 115 —has coordinates→ coordinates 48°41′53″N 86°39′17″W"
+    },
+    {
+      "id": "e48",
+      "source": "115",
+      "target": "service period 1891–1899",
+      "predicate": "has service period",
+      "cluster": null,
+      "color": "#f0638b",
+      "tooltip": "115 —has service period→ service period 1891–1899"
+    },
+    {
+      "id": "e49",
+      "source": "115",
+      "target": "Soo Locks",
+      "predicate": "headed for",
+      "cluster": null,
+      "color": "#4913e3",
+      "tooltip": "115 —headed for→ Soo Locks"
+    },
+    {
+      "id": "e50",
+      "source": "Marathon, Ontario",
+      "target": "Ontario",
+      "predicate": "in",
+      "cluster": null,
+      "color": "#d8b050",
+      "tooltip": "Marathon, Ontario —in→ Ontario"
+    },
+    {
+      "id": "e51",
+      "source": "Pic Island",
+      "target": "Lake Superior",
+      "predicate": "in",
+      "cluster": null,
+      "color": "#d8b050",
+      "tooltip": "Pic Island —in→ Lake Superior"
+    },
+    {
+      "id": "e52",
+      "source": "1893 collision",
+      "target": "Thomas Wilson",
+      "predicate": "involved",
+      "cluster": null,
+      "color": "#bd2a6c",
+      "tooltip": "1893 collision —involved→ Thomas Wilson"
+    },
+    {
+      "id": "e53",
+      "source": "1894 collision",
+      "target": "Mesaba (steamer)",
+      "predicate": "involved",
+      "cluster": null,
+      "color": "#bd2a6c",
+      "tooltip": "1894 collision —involved→ Mesaba (steamer)"
+    },
+    {
+      "id": "e54",
+      "source": "3,000 tons of iron ore",
+      "target": "iron ore",
+      "predicate": "is",
+      "cluster": null,
+      "color": "#592ae1",
+      "tooltip": "3,000 tons of iron ore —is→ iron ore"
+    },
+    {
+      "id": "e55",
+      "source": "Arthur A. Boyce",
+      "target": "Captain Boyce",
+      "predicate": "is",
+      "cluster": null,
+      "color": "#592ae1",
+      "tooltip": "Arthur A. Boyce —is→ Captain Boyce"
+    },
+    {
+      "id": "e56",
+      "source": "101 (whaleback barge)",
+      "target": "whaleback barge",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "101 (whaleback barge) —is a→ whaleback barge"
+    },
+    {
+      "id": "e57",
+      "source": "115",
+      "target": "American whaleback barge",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "115 —is a→ American whaleback barge"
+    },
+    {
+      "id": "e58",
+      "source": "115",
+      "target": "whaleback",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "115 —is a→ whaleback"
+    },
+    {
+      "id": "e59",
+      "source": "115",
+      "target": "whaleback barge",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "115 —is a→ whaleback barge"
+    },
+    {
+      "id": "e60",
+      "source": "A.D. Thompson",
+      "target": "whaleback steamer",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "A.D. Thompson —is a→ whaleback steamer"
+    },
+    {
+      "id": "e61",
+      "source": "Alexander McDougall",
+      "target": "Great Lakes captain",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "Alexander McDougall —is a→ Great Lakes captain"
+    },
+    {
+      "id": "e62",
+      "source": "Alexander McDougall",
+      "target": "Scottish immigrant",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "Alexander McDougall —is a→ Scottish immigrant"
+    },
+    {
+      "id": "e63",
+      "source": "Colgate Hoyt",
+      "target": "whaleback freighter",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "Colgate Hoyt —is a→ whaleback freighter"
+    },
+    {
+      "id": "e64",
+      "source": "Mesaba (steamer)",
+      "target": "steam-powered ship (towing)",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "Mesaba (steamer) —is a→ steam-powered ship (towing)"
+    },
+    {
+      "id": "e65",
+      "source": "Thomas Wilson",
+      "target": "whaleback freighter",
+      "predicate": "is a",
+      "cluster": null,
+      "color": "#df8d65",
+      "tooltip": "Thomas Wilson —is a→ whaleback freighter"
+    },
+    {
+      "id": "e66",
+      "source": "115",
+      "target": "Great Lakes",
+      "predicate": "is a shipwreck on the",
+      "cluster": null,
+      "color": "#3333ec",
+      "tooltip": "115 —is a shipwreck on the→ Great Lakes"
+    },
+    {
+      "id": "e67",
+      "source": "Alexander McDougall",
+      "target": "entrepreneur",
+      "predicate": "is an",
+      "cluster": null,
+      "color": "#a659d7",
+      "tooltip": "Alexander McDougall —is an→ entrepreneur"
+    },
+    {
+      "id": "e68",
+      "source": "Alexander McDougall",
+      "target": "inventor",
+      "predicate": "is an",
+      "cluster": null,
+      "color": "#a659d7",
+      "tooltip": "Alexander McDougall —is an→ inventor"
+    },
+    {
+      "id": "e69",
+      "source": "St. Marys River",
+      "target": "Sault Ste. Marie Canal",
+      "predicate": "is below",
+      "cluster": null,
+      "color": "#52d6d4",
+      "tooltip": "St. Marys River —is below→ Sault Ste. Marie Canal"
+    },
+    {
+      "id": "e70",
+      "source": "wreck of 115",
+      "target": "115 wreck",
+      "predicate": "is the",
+      "cluster": null,
+      "color": "#1f67c8",
+      "tooltip": "wreck of 115 —is the→ 115 wreck"
+    },
+    {
+      "id": "e71",
+      "source": "whaleback",
+      "target": "vertical sides (traditional freighters)",
+      "predicate": "lacks",
+      "cluster": null,
+      "color": "#4099eb",
+      "tooltip": "whaleback —lacks→ vertical sides (traditional freighters)"
+    },
+    {
+      "id": "e72",
+      "source": "coordinates 48°41′53″N 86°39′17″W",
+      "target": "48.69806°N",
+      "predicate": "latitude",
+      "cluster": null,
+      "color": "#e970ee",
+      "tooltip": "coordinates 48°41′53″N 86°39′17″W —latitude→ 48.69806°N"
+    },
+    {
+      "id": "e73",
+      "source": "115",
+      "target": "3,000 tons of iron ore",
+      "predicate": "loaded",
+      "cluster": null,
+      "color": "#c9dd46",
+      "tooltip": "115 —loaded→ 3,000 tons of iron ore"
+    },
+    {
+      "id": "e74",
+      "source": "twisted steel plates",
+      "target": "cliff",
+      "predicate": "located on",
+      "cluster": null,
+      "color": "#35da86",
+      "tooltip": "twisted steel plates —located on→ cliff"
+    },
+    {
+      "id": "e75",
+      "source": "wreck of 115",
+      "target": "rock bottom",
+      "predicate": "located on",
+      "cluster": null,
+      "color": "#35da86",
+      "tooltip": "wreck of 115 —located on→ rock bottom"
+    },
+    {
+      "id": "e76",
+      "source": "coordinates 48°41′53″N 86°39′17″W",
+      "target": "86.65472°W",
+      "predicate": "longitude",
+      "cluster": null,
+      "color": "#2c34e3",
+      "tooltip": "coordinates 48°41′53″N 86°39′17″W —longitude→ 86.65472°W"
+    },
+    {
+      "id": "e77",
+      "source": "crew of eight",
+      "target": "makeshift raft",
+      "predicate": "made",
+      "cluster": null,
+      "color": "#e16230",
+      "tooltip": "crew of eight —made→ makeshift raft"
+    },
+    {
+      "id": "e78",
+      "source": "crew of eight",
+      "target": "Christmas",
+      "predicate": "made it home by",
+      "cluster": null,
+      "color": "#249fd8",
+      "tooltip": "crew of eight —made it home by→ Christmas"
+    },
+    {
+      "id": "e79",
+      "source": "crew of eight",
+      "target": "Middletown, Ontario",
+      "predicate": "made it to",
+      "cluster": null,
+      "color": "#e24242",
+      "tooltip": "crew of eight —made it to→ Middletown, Ontario"
+    },
+    {
+      "id": "e80",
+      "source": "Pic Island",
+      "target": "Marathon, Ontario",
+      "predicate": "near",
+      "cluster": null,
+      "color": "#67eb32",
+      "tooltip": "Pic Island —near→ Marathon, Ontario"
+    },
+    {
+      "id": "e81",
+      "source": "dry docked in Duluth",
+      "target": "Duluth, Minnesota",
+      "predicate": "occurred in",
+      "cluster": null,
+      "color": "#d99741",
+      "tooltip": "dry docked in Duluth —occurred in→ Duluth, Minnesota"
+    },
+    {
+      "id": "e82",
+      "source": "dry docked in West Superior",
+      "target": "West Superior, Wisconsin",
+      "predicate": "occurred in",
+      "cluster": null,
+      "color": "#d99741",
+      "tooltip": "dry docked in West Superior —occurred in→ West Superior, Wisconsin"
+    },
+    {
+      "id": "e83",
+      "source": "1894 collision",
+      "target": "Lake George",
+      "predicate": "occurred on",
+      "cluster": null,
+      "color": "#49dced",
+      "tooltip": "1894 collision —occurred on→ Lake George"
+    },
+    {
+      "id": "e84",
+      "source": "1897 grounding",
+      "target": "St. Marys River",
+      "predicate": "occurred on",
+      "cluster": null,
+      "color": "#49dced",
+      "tooltip": "1897 grounding —occurred on→ St. Marys River"
+    },
+    {
+      "id": "e85",
+      "source": "Colgate Hoyt",
+      "target": "fuel scarcity",
+      "predicate": "proceeded due to",
+      "cluster": null,
+      "color": "#eb5c5c",
+      "tooltip": "Colgate Hoyt —proceeded due to→ fuel scarcity"
+    },
+    {
+      "id": "e86",
+      "source": "Colgate Hoyt",
+      "target": "Sault Ste. Marie",
+      "predicate": "proceeded to",
+      "cluster": null,
+      "color": "#d61ea8",
+      "tooltip": "Colgate Hoyt —proceeded to→ Sault Ste. Marie"
+    },
+    {
+      "id": "e87",
+      "source": "Alexander McDougall",
+      "target": "Christopher Columbus (excursion liner)",
+      "predicate": "promoted using",
+      "cluster": null,
+      "color": "#42da9b",
+      "tooltip": "Alexander McDougall —promoted using→ Christopher Columbus (excursion liner)"
+    },
+    {
+      "id": "e88",
+      "source": "115",
+      "target": "hull plates",
+      "predicate": "required replacement of",
+      "cluster": null,
+      "color": "#b633dc",
+      "tooltip": "115 —required replacement of→ hull plates"
+    },
+    {
+      "id": "e89",
+      "source": "115",
+      "target": "keel plates",
+      "predicate": "required replacement of",
+      "cluster": null,
+      "color": "#b633dc",
+      "tooltip": "115 —required replacement of→ keel plates"
+    },
+    {
+      "id": "e90",
+      "source": "Alexander McDougall",
+      "target": "Charles W. Wetmore",
+      "predicate": "sent",
+      "cluster": null,
+      "color": "#d123c6",
+      "tooltip": "Alexander McDougall —sent→ Charles W. Wetmore"
+    },
+    {
+      "id": "e91",
+      "source": "Charles W. Wetmore",
+      "target": "London",
+      "predicate": "sent to",
+      "cluster": null,
+      "color": "#cde55a",
+      "tooltip": "Charles W. Wetmore —sent to→ London"
+    },
+    {
+      "id": "e92",
+      "source": "dive footage (about 1980)",
+      "target": "stern",
+      "predicate": "shows intact",
+      "cluster": null,
+      "color": "#5aa9e0",
+      "tooltip": "dive footage (about 1980) —shows intact→ stern"
+    },
+    {
+      "id": "e93",
+      "source": "dive footage (about 1980)",
+      "target": "turrets",
+      "predicate": "shows intact",
+      "cluster": null,
+      "color": "#5aa9e0",
+      "tooltip": "dive footage (about 1980) —shows intact→ turrets"
+    },
+    {
+      "id": "e94",
+      "source": "crew of eight",
+      "target": "Canadian Pacific Railway track",
+      "predicate": "stumbled upon",
+      "cluster": null,
+      "color": "#7fd23b",
+      "tooltip": "crew of eight —stumbled upon→ Canadian Pacific Railway track"
+    },
+    {
+      "id": "e95",
+      "source": "cook",
+      "target": "frostbitten feet",
+      "predicate": "suffered",
+      "cluster": null,
+      "color": "#52dfaf",
+      "tooltip": "cook —suffered→ frostbitten feet"
+    },
+    {
+      "id": "e96",
+      "source": "Pickands Mather & Company",
+      "target": "American Steel Barge Company fleet",
+      "predicate": "took over management of",
+      "cluster": null,
+      "color": "#67edc8",
+      "tooltip": "Pickands Mather & Company —took over management of→ American Steel Barge Company fleet"
+    },
+    {
+      "id": "e97",
+      "source": "115",
+      "target": "life raft",
+      "predicate": "used",
+      "cluster": null,
+      "color": "#2690e2",
+      "tooltip": "115 —used→ life raft"
+    },
+    {
+      "id": "e98",
+      "source": "115",
+      "target": "small life raft",
+      "predicate": "used",
+      "cluster": null,
+      "color": "#2690e2",
+      "tooltip": "115 —used→ small life raft"
+    },
+    {
+      "id": "e99",
+      "source": "crew of eight",
+      "target": "log cabin",
+      "predicate": "used",
+      "cluster": null,
+      "color": "#2690e2",
+      "tooltip": "crew of eight —used→ log cabin"
+    },
+    {
+      "id": "e100",
+      "source": "crew of eight",
+      "target": "tree branches",
+      "predicate": "used",
+      "cluster": null,
+      "color": "#2690e2",
+      "tooltip": "crew of eight —used→ tree branches"
+    },
+    {
+      "id": "e101",
+      "source": "115",
+      "target": "18.75 feet deep",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "115 —was→ 18.75 feet deep"
+    },
+    {
+      "id": "e102",
+      "source": "115",
+      "target": "256 feet long",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "115 —was→ 256 feet long"
+    },
+    {
+      "id": "e103",
+      "source": "115",
+      "target": "36 feet wide",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "115 —was→ 36 feet wide"
+    },
+    {
+      "id": "e104",
+      "source": "115",
+      "target": "dry docked in Duluth",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "115 —was→ dry docked in Duluth"
+    },
+    {
+      "id": "e105",
+      "source": "115",
+      "target": "dry docked in West Superior",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "115 —was→ dry docked in West Superior"
+    },
+    {
+      "id": "e106",
+      "source": "115",
+      "target": "enrolled in Duluth",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "115 —was→ enrolled in Duluth"
+    },
+    {
+      "id": "e107",
+      "source": "115",
+      "target": "final shipwreck on the Great Lakes during the 1800s",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "115 —was→ final shipwreck on the Great Lakes during the 1800s"
+    },
+    {
+      "id": "e108",
+      "source": "115",
+      "target": "launched August 15, 1891",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "115 —was→ launched August 15, 1891"
+    },
+    {
+      "id": "e109",
+      "source": "wreck of 115",
+      "target": "wreck located in 1980",
+      "predicate": "was",
+      "cluster": null,
+      "color": "#a432cf",
+      "tooltip": "wreck of 115 —was→ wreck located in 1980"
+    },
+    {
+      "id": "e110",
+      "source": "115",
+      "target": "unrigged barge",
+      "predicate": "was an",
+      "cluster": null,
+      "color": "#ec1a78",
+      "tooltip": "115 —was an→ unrigged barge"
+    },
+    {
+      "id": "e111",
+      "source": "115",
+      "target": "American Steel Barge Company",
+      "predicate": "was built by",
+      "cluster": null,
+      "color": "#32dc52",
+      "tooltip": "115 —was built by→ American Steel Barge Company"
+    },
+    {
+      "id": "e112",
+      "source": "115",
+      "target": "McDougall fleet",
+      "predicate": "was built for",
+      "cluster": null,
+      "color": "#6297ee",
+      "tooltip": "115 —was built for→ McDougall fleet"
+    },
+    {
+      "id": "e113",
+      "source": "115",
+      "target": "Superior, Wisconsin",
+      "predicate": "was built in",
+      "cluster": null,
+      "color": "#68e68f",
+      "tooltip": "115 —was built in→ Superior, Wisconsin"
+    },
+    {
+      "id": "e114",
+      "source": "115",
+      "target": "West Superior, Wisconsin",
+      "predicate": "was built in",
+      "cluster": null,
+      "color": "#68e68f",
+      "tooltip": "115 —was built in→ West Superior, Wisconsin"
+    },
+    {
+      "id": "e115",
+      "source": "wreck of 115",
+      "target": "wreck hunter Ryan LeBlanc",
+      "predicate": "was discovered by",
+      "cluster": null,
+      "color": "#c62cd0",
+      "tooltip": "wreck of 115 —was discovered by→ wreck hunter Ryan LeBlanc"
+    },
+    {
+      "id": "e116",
+      "source": "115",
+      "target": "Duluth, Minnesota",
+      "predicate": "was enrolled in",
+      "cluster": null,
+      "color": "#bf4a37",
+      "tooltip": "115 —was enrolled in→ Duluth, Minnesota"
+    },
+    {
+      "id": "e117",
+      "source": "115",
+      "target": "Colgate Hoyt",
+      "predicate": "was in tow of",
+      "cluster": null,
+      "color": "#80ed62",
+      "tooltip": "115 —was in tow of→ Colgate Hoyt"
+    },
+    {
+      "id": "e118",
+      "source": "115",
+      "target": "1893 collision",
+      "predicate": "was involved in",
+      "cluster": null,
+      "color": "#b0d878",
+      "tooltip": "115 —was involved in→ 1893 collision"
+    },
+    {
+      "id": "e119",
+      "source": "115",
+      "target": "1894 collision",
+      "predicate": "was involved in",
+      "cluster": null,
+      "color": "#b0d878",
+      "tooltip": "115 —was involved in→ 1894 collision"
+    },
+    {
+      "id": "e120",
+      "source": "115",
+      "target": "1897 grounding",
+      "predicate": "was involved in",
+      "cluster": null,
+      "color": "#b0d878",
+      "tooltip": "115 —was involved in→ 1897 grounding"
+    },
+    {
+      "id": "e121",
+      "source": "115",
+      "target": "Sault Ste. Marie",
+      "predicate": "was near",
+      "cluster": null,
+      "color": "#1fe02d",
+      "tooltip": "115 —was near→ Sault Ste. Marie"
+    },
+    {
+      "id": "e122",
+      "source": "115",
+      "target": "American Steel Barge Company fleet",
+      "predicate": "was part of",
+      "cluster": null,
+      "color": "#71e2a6",
+      "tooltip": "115 —was part of→ American Steel Barge Company fleet"
+    },
+    {
+      "id": "e123",
+      "source": "bell",
+      "target": "wreck of 115",
+      "predicate": "was retrieved from",
+      "cluster": null,
+      "color": "#c1c636",
+      "tooltip": "bell —was retrieved from→ wreck of 115"
+    },
+    {
+      "id": "e124",
+      "source": "115",
+      "target": "second whaleback lost on the Great Lakes",
+      "predicate": "was the",
+      "cluster": null,
+      "color": "#72e440",
+      "tooltip": "115 —was the→ second whaleback lost on the Great Lakes"
+    },
+    {
+      "id": "e125",
+      "source": "115",
+      "target": "steam-powered ship (towing)",
+      "predicate": "was towed by a",
+      "cluster": null,
+      "color": "#e17d92",
+      "tooltip": "115 —was towed by a→ steam-powered ship (towing)"
+    },
+    {
+      "id": "e126",
+      "source": "Alexander McDougall",
+      "target": "shipbuilders",
+      "predicate": "was unable to persuade",
+      "cluster": null,
+      "color": "#d19051",
+      "tooltip": "Alexander McDougall —was unable to persuade→ shipbuilders"
+    },
+    {
+      "id": "e127",
+      "source": "115",
+      "target": "Arthur A. Boyce",
+      "predicate": "was under the command of",
+      "cluster": null,
+      "color": "#23b4e3",
+      "tooltip": "115 —was under the command of→ Arthur A. Boyce"
+    },
+    {
+      "id": "e128",
+      "source": "115",
+      "target": "A.D. Thompson",
+      "predicate": "was under tow of",
+      "cluster": null,
+      "color": "#6ef0df",
+      "tooltip": "115 —was under tow of→ A.D. Thompson"
+    },
+    {
+      "id": "e129",
+      "source": "whaleback",
+      "target": "pig boats",
+      "predicate": "were called",
+      "cluster": null,
+      "color": "#a37cde",
+      "tooltip": "whaleback —were called→ pig boats"
+    },
+    {
+      "id": "e130",
+      "source": "crew of eight",
+      "target": "Canadian Pacific Railway",
+      "predicate": "were located by",
+      "cluster": null,
+      "color": "#dac865",
+      "tooltip": "crew of eight —were located by→ Canadian Pacific Railway"
+    }
+  ],
+  "clusters": [],
+  "edgeClusters": [],
+  "topEntities": [
+    {
+      "label": "115",
+      "degree": 58,
+      "indegree": 0,
+      "outdegree": 58,
+      "cluster": null
+    },
+    {
+      "label": "crew of eight",
+      "degree": 12,
+      "indegree": 1,
+      "outdegree": 11,
+      "cluster": null
+    },
+    {
+      "label": "Alexander McDougall",
+      "degree": 9,
+      "indegree": 2,
+      "outdegree": 7,
+      "cluster": null
+    },
+    {
+      "label": "wreck of 115",
+      "degree": 7,
+      "indegree": 1,
+      "outdegree": 6,
+      "cluster": null
+    },
+    {
+      "label": "Colgate Hoyt",
+      "degree": 6,
+      "indegree": 2,
+      "outdegree": 4,
+      "cluster": null
+    },
+    {
+      "label": "whaleback",
+      "degree": 6,
+      "indegree": 1,
+      "outdegree": 5,
+      "cluster": null
+    },
+    {
+      "label": "Pic Island",
+      "degree": 4,
+      "indegree": 2,
+      "outdegree": 2,
+      "cluster": null
+    },
+    {
+      "label": "1894 collision",
+      "degree": 3,
+      "indegree": 1,
+      "outdegree": 2,
+      "cluster": null
+    },
+    {
+      "label": "American Steel Barge Company",
+      "degree": 3,
+      "indegree": 1,
+      "outdegree": 2,
+      "cluster": null
+    },
+    {
+      "label": "American Steel Barge Company fleet",
+      "degree": 3,
+      "indegree": 2,
+      "outdegree": 1,
+      "cluster": null
+    }
+  ],
+  "topRelations": [
+    {
+      "predicate": "is a",
+      "count": 10,
+      "cluster": null,
+      "color": "#df8d65"
+    },
+    {
+      "predicate": "was",
+      "count": 9,
+      "cluster": null,
+      "color": "#a432cf"
+    },
+    {
+      "predicate": "carried",
+      "count": 6,
+      "cluster": null,
+      "color": "#3261e6"
+    },
+    {
+      "predicate": "had",
+      "count": 5,
+      "cluster": null,
+      "color": "#e2b51a"
+    },
+    {
+      "predicate": "used",
+      "count": 4,
+      "cluster": null,
+      "color": "#2690e2"
+    },
+    {
+      "predicate": "also known as",
+      "count": 3,
+      "cluster": null,
+      "color": "#df9c5a"
+    },
+    {
+      "predicate": "based in",
+      "count": 3,
+      "cluster": null,
+      "color": "#808de2"
+    },
+    {
+      "predicate": "has",
+      "count": 3,
+      "cluster": null,
+      "color": "#e1ce4f"
+    },
+    {
+      "predicate": "was involved in",
+      "count": 3,
+      "cluster": null,
+      "color": "#b0d878"
+    },
+    {
+      "predicate": "for",
+      "count": 2,
+      "cluster": null,
+      "color": "#d89e70"
+    }
+  ],
+  "stats": {
+    "entities": 121,
+    "relations": 131,
+    "relationTypes": 83,
+    "entityClusters": 0,
+    "edgeClusters": 0,
+    "isolatedEntities": 1,
+    "components": 5,
+    "averageDegree": 2.17,
+    "density": 0.009
+  },
+  "isolatedEntities": [
+    "final trip of the shipping season"
+  ],
+  "components": [
+    {
+      "size": 105,
+      "members": [
+        "101 (whaleback barge)",
+        "115",
+        "18.75 feet deep",
+        "1893 collision",
+        "1894 collision",
+        "1897 grounding",
+        "256 feet long",
+        "3,000 tons of iron ore",
+        "36 feet wide",
+        "A.D. Thompson",
+        "Alexander McDougall",
+        "American Steel Barge Company",
+        "American Steel Barge Company fleet",
+        "American whaleback barge",
+        "Arthur A. Boyce",
+        "Barge 115",
+        "bread (two loaves)",
+        "Buffalo, New York",
+        "Canadian Pacific Railway",
+        "Canadian Pacific Railway track",
+        "candles",
+        "Captain Boyce",
+        "Charles W. Wetmore",
+        "Christmas",
+        "Christopher Columbus (excursion liner)",
+        "Cleveland, Ohio",
+        "cliff",
+        "Colgate Hoyt",
+        "conoidal ends",
+        "cook",
+        "crew of eight",
+        "dive footage (about 1980)",
+        "dry docked in Duluth",
+        "dry docked in West Superior",
+        "Duluth, Minnesota",
+        "enrolled in Duluth",
+        "entered service August 25, 1891",
+        "entrepreneur",
+        "final shipwreck on the Great Lakes during the 1800s",
+        "frostbitten feet",
+        "fuel scarcity",
+        "grease",
+        "Great Lakes",
+        "Great Lakes captain",
+        "gross tonnage 1,169 tons",
+        "ham",
+        "home port Buffalo",
+        "hull frames",
+        "hull frames laid down May 21, 1891",
+        "hull plates",
+        "inventor",
+        "iron ore",
+        "keel plates",
+        "Lake Erie",
+        "Lake George",
+        "Lake Superior",
+        "launched August 15, 1891",
+        "life raft",
+        "load of iron ore",
+        "log cabin",
+        "London",
+        "makeshift raft",
+        "Marathon, Ontario",
+        "McDougall fleet",
+        "Mesaba (steamer)",
+        "Middletown, Ontario",
+        "net tonnage 1,110 tons",
+        "No.115",
+        "Ontario",
+        "Pic Island",
+        "Pickands Mather & Company",
+        "pig boats",
+        "repairs",
+        "rounded decks",
+        "rounded hull shapes",
+        "Sault Ste. Marie",
+        "Sault Ste. Marie Canal",
+        "Scottish immigrant",
+        "second whaleback lost on the Great Lakes",
+        "service period 1891–1899",
+        "shipbuilders",
+        "small life raft",
+        "Soo Locks",
+        "St. Marys River",
+        "steam-powered ship (towing)",
+        "stern",
+        "storm",
+        "stove",
+        "Superior, Wisconsin",
+        "Thomas Wilson",
+        "tree branches",
+        "tugboats",
+        "turrets",
+        "twisted steel plates",
+        "Two Harbors, Minnesota",
+        "unrigged barge",
+        "US official number 53268",
+        "vertical sides (traditional freighters)",
+        "West Superior, Wisconsin",
+        "whaleback",
+        "Whaleback 115",
+        "whaleback barge",
+        "whaleback freighter",
+        "whaleback ship design",
+        "whaleback steamer"
+      ]
+    },
+    {
+      "size": 10,
+      "members": [
+        "115 wreck",
+        "48.69806°N",
+        "86.65472°W",
+        "bell",
+        "coordinates 48°41′53″N 86°39′17″W",
+        "depth between 40 and 80 feet (12.2–24.4 m)",
+        "rock bottom",
+        "wreck hunter Ryan LeBlanc",
+        "wreck located in 1980",
+        "wreck of 115"
+      ]
+    },
+    {
+      "size": 3,
+      "members": [
+        "bow",
+        "maritime historian Cris Kohl",
+        "The 100 Best Great Lakes Shipwrecks – Volume II"
+      ]
+    },
+    {
+      "size": 2,
+      "members": [
+        "City of Everett",
+        "Everett, Washington"
+      ]
+    },
+    {
+      "size": 1,
+      "members": [
+        "final trip of the shipping season"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source": "115",
+      "predicate": "also known as",
+      "target": "Barge 115",
+      "edgeId": "e0",
+      "color": "#df9c5a"
+    },
+    {
+      "source": "115",
+      "predicate": "also known as",
+      "target": "No.115",
+      "edgeId": "e1",
+      "color": "#df9c5a"
+    },
+    {
+      "source": "115",
+      "predicate": "also known as",
+      "target": "Whaleback 115",
+      "edgeId": "e2",
+      "color": "#df9c5a"
+    },
+    {
+      "source": "twisted steel plates",
+      "predicate": "associated with wrecking at",
+      "target": "Pic Island",
+      "edgeId": "e3",
+      "color": "#60db2a"
+    },
+    {
+      "source": "wreck of 115",
+      "predicate": "at",
+      "target": "depth between 40 and 80 feet (12.2–24.4 m)",
+      "edgeId": "e4",
+      "color": "#ca82df"
+    },
+    {
+      "source": "American Steel Barge Company fleet",
+      "predicate": "based in",
+      "target": "Buffalo, New York",
+      "edgeId": "e5",
+      "color": "#808de2"
+    },
+    {
+      "source": "McDougall fleet",
+      "predicate": "based in",
+      "target": "Buffalo, New York",
+      "edgeId": "e6",
+      "color": "#808de2"
+    },
+    {
+      "source": "Pickands Mather & Company",
+      "predicate": "based in",
+      "target": "Cleveland, Ohio",
+      "edgeId": "e7",
+      "color": "#808de2"
+    },
+    {
+      "source": "Canadian Pacific Railway track",
+      "predicate": "belongs to",
+      "target": "Canadian Pacific Railway",
+      "edgeId": "e8",
+      "color": "#63f09c"
+    },
+    {
+      "source": "115",
+      "predicate": "bound for",
+      "target": "Lake Erie",
+      "edgeId": "e9",
+      "color": "#37d6e5"
+    },
+    {
+      "source": "115",
+      "predicate": "broke",
+      "target": "hull plates",
+      "edgeId": "e10",
+      "color": "#dc8256"
+    },
+    {
+      "source": "115",
+      "predicate": "broke away from",
+      "target": "Colgate Hoyt",
+      "edgeId": "e11",
+      "color": "#d14e44"
+    },
+    {
+      "source": "115",
+      "predicate": "broke away on",
+      "target": "Lake Superior",
+      "edgeId": "e12",
+      "color": "#1db0cf"
+    },
+    {
+      "source": "City of Everett",
+      "predicate": "built in",
+      "target": "Everett, Washington",
+      "edgeId": "e13",
+      "color": "#5fa4eb"
+    },
+    {
+      "source": "The 100 Best Great Lakes Shipwrecks – Volume II",
+      "predicate": "by",
+      "target": "maritime historian Cris Kohl",
+      "edgeId": "e14",
+      "color": "#97e671"
+    },
+    {
+      "source": "115",
+      "predicate": "carried",
+      "target": "iron ore",
+      "edgeId": "e15",
+      "color": "#3261e6"
+    },
+    {
+      "source": "115",
+      "predicate": "carried",
+      "target": "load of iron ore",
+      "edgeId": "e16",
+      "color": "#3261e6"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "carried",
+      "target": "bread (two loaves)",
+      "edgeId": "e17",
+      "color": "#3261e6"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "carried",
+      "target": "candles",
+      "edgeId": "e18",
+      "color": "#3261e6"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "carried",
+      "target": "grease",
+      "edgeId": "e19",
+      "color": "#3261e6"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "carried",
+      "target": "ham",
+      "edgeId": "e20",
+      "color": "#3261e6"
+    },
+    {
+      "source": "log cabin",
+      "predicate": "contained",
+      "target": "stove",
+      "edgeId": "e21",
+      "color": "#38d080"
+    },
+    {
+      "source": "115",
+      "predicate": "crashed into",
+      "target": "Pic Island",
+      "edgeId": "e22",
+      "color": "#76ebc3"
+    },
+    {
+      "source": "115",
+      "predicate": "departed from",
+      "target": "Two Harbors, Minnesota",
+      "edgeId": "e23",
+      "color": "#41e79b"
+    },
+    {
+      "source": "whaleback ship design",
+      "predicate": "designed by",
+      "target": "Alexander McDougall",
+      "edgeId": "e24",
+      "color": "#735fd8"
+    },
+    {
+      "source": "115",
+      "predicate": "drifted on",
+      "target": "Lake Superior",
+      "edgeId": "e25",
+      "color": "#566ed6"
+    },
+    {
+      "source": "115",
+      "predicate": "encountered",
+      "target": "storm",
+      "edgeId": "e26",
+      "color": "#c63737"
+    },
+    {
+      "source": "Colgate Hoyt",
+      "predicate": "enlisted",
+      "target": "tugboats",
+      "edgeId": "e27",
+      "color": "#d7596b"
+    },
+    {
+      "source": "115",
+      "predicate": "entered service",
+      "target": "entered service August 25, 1891",
+      "edgeId": "e28",
+      "color": "#13d673"
+    },
+    {
+      "source": "The 100 Best Great Lakes Shipwrecks – Volume II",
+      "predicate": "erroneously states intact",
+      "target": "bow",
+      "edgeId": "e29",
+      "color": "#ee5991"
+    },
+    {
+      "source": "dry docked in Duluth",
+      "predicate": "for",
+      "target": "repairs",
+      "edgeId": "e30",
+      "color": "#d89e70"
+    },
+    {
+      "source": "dry docked in West Superior",
+      "predicate": "for",
+      "target": "repairs",
+      "edgeId": "e31",
+      "color": "#d89e70"
+    },
+    {
+      "source": "American Steel Barge Company",
+      "predicate": "founded by",
+      "target": "Alexander McDougall",
+      "edgeId": "e32",
+      "color": "#e56275"
+    },
+    {
+      "source": "American Steel Barge Company",
+      "predicate": "founded in",
+      "target": "Superior, Wisconsin",
+      "edgeId": "e33",
+      "color": "#c9a836"
+    },
+    {
+      "source": "115",
+      "predicate": "had",
+      "target": "cook",
+      "edgeId": "e34",
+      "color": "#e2b51a"
+    },
+    {
+      "source": "115",
+      "predicate": "had",
+      "target": "gross tonnage 1,169 tons",
+      "edgeId": "e35",
+      "color": "#e2b51a"
+    },
+    {
+      "source": "115",
+      "predicate": "had",
+      "target": "hull frames laid down May 21, 1891",
+      "edgeId": "e36",
+      "color": "#e2b51a"
+    },
+    {
+      "source": "115",
+      "predicate": "had",
+      "target": "net tonnage 1,110 tons",
+      "edgeId": "e37",
+      "color": "#e2b51a"
+    },
+    {
+      "source": "115",
+      "predicate": "had",
+      "target": "turrets",
+      "edgeId": "e38",
+      "color": "#e2b51a"
+    },
+    {
+      "source": "115",
+      "predicate": "had complement",
+      "target": "crew of eight",
+      "edgeId": "e39",
+      "color": "#1a3adc"
+    },
+    {
+      "source": "115",
+      "predicate": "had home port",
+      "target": "home port Buffalo",
+      "edgeId": "e40",
+      "color": "#70d7af"
+    },
+    {
+      "source": "115",
+      "predicate": "had hull frames",
+      "target": "hull frames",
+      "edgeId": "e41",
+      "color": "#eb4794"
+    },
+    {
+      "source": "Thomas Wilson",
+      "predicate": "had in tow",
+      "target": "101 (whaleback barge)",
+      "edgeId": "e42",
+      "color": "#ee6979"
+    },
+    {
+      "source": "115",
+      "predicate": "had US official number",
+      "target": "US official number 53268",
+      "edgeId": "e43",
+      "color": "#ec841e"
+    },
+    {
+      "source": "whaleback",
+      "predicate": "has",
+      "target": "conoidal ends",
+      "edgeId": "e44",
+      "color": "#e1ce4f"
+    },
+    {
+      "source": "whaleback",
+      "predicate": "has",
+      "target": "rounded decks",
+      "edgeId": "e45",
+      "color": "#e1ce4f"
+    },
+    {
+      "source": "whaleback",
+      "predicate": "has",
+      "target": "rounded hull shapes",
+      "edgeId": "e46",
+      "color": "#e1ce4f"
+    },
+    {
+      "source": "wreck of 115",
+      "predicate": "has coordinates",
+      "target": "coordinates 48°41′53″N 86°39′17″W",
+      "edgeId": "e47",
+      "color": "#7a34d9"
+    },
+    {
+      "source": "115",
+      "predicate": "has service period",
+      "target": "service period 1891–1899",
+      "edgeId": "e48",
+      "color": "#f0638b"
+    },
+    {
+      "source": "115",
+      "predicate": "headed for",
+      "target": "Soo Locks",
+      "edgeId": "e49",
+      "color": "#4913e3"
+    },
+    {
+      "source": "Marathon, Ontario",
+      "predicate": "in",
+      "target": "Ontario",
+      "edgeId": "e50",
+      "color": "#d8b050"
+    },
+    {
+      "source": "Pic Island",
+      "predicate": "in",
+      "target": "Lake Superior",
+      "edgeId": "e51",
+      "color": "#d8b050"
+    },
+    {
+      "source": "1893 collision",
+      "predicate": "involved",
+      "target": "Thomas Wilson",
+      "edgeId": "e52",
+      "color": "#bd2a6c"
+    },
+    {
+      "source": "1894 collision",
+      "predicate": "involved",
+      "target": "Mesaba (steamer)",
+      "edgeId": "e53",
+      "color": "#bd2a6c"
+    },
+    {
+      "source": "3,000 tons of iron ore",
+      "predicate": "is",
+      "target": "iron ore",
+      "edgeId": "e54",
+      "color": "#592ae1"
+    },
+    {
+      "source": "Arthur A. Boyce",
+      "predicate": "is",
+      "target": "Captain Boyce",
+      "edgeId": "e55",
+      "color": "#592ae1"
+    },
+    {
+      "source": "101 (whaleback barge)",
+      "predicate": "is a",
+      "target": "whaleback barge",
+      "edgeId": "e56",
+      "color": "#df8d65"
+    },
+    {
+      "source": "115",
+      "predicate": "is a",
+      "target": "American whaleback barge",
+      "edgeId": "e57",
+      "color": "#df8d65"
+    },
+    {
+      "source": "115",
+      "predicate": "is a",
+      "target": "whaleback",
+      "edgeId": "e58",
+      "color": "#df8d65"
+    },
+    {
+      "source": "115",
+      "predicate": "is a",
+      "target": "whaleback barge",
+      "edgeId": "e59",
+      "color": "#df8d65"
+    },
+    {
+      "source": "A.D. Thompson",
+      "predicate": "is a",
+      "target": "whaleback steamer",
+      "edgeId": "e60",
+      "color": "#df8d65"
+    },
+    {
+      "source": "Alexander McDougall",
+      "predicate": "is a",
+      "target": "Great Lakes captain",
+      "edgeId": "e61",
+      "color": "#df8d65"
+    },
+    {
+      "source": "Alexander McDougall",
+      "predicate": "is a",
+      "target": "Scottish immigrant",
+      "edgeId": "e62",
+      "color": "#df8d65"
+    },
+    {
+      "source": "Colgate Hoyt",
+      "predicate": "is a",
+      "target": "whaleback freighter",
+      "edgeId": "e63",
+      "color": "#df8d65"
+    },
+    {
+      "source": "Mesaba (steamer)",
+      "predicate": "is a",
+      "target": "steam-powered ship (towing)",
+      "edgeId": "e64",
+      "color": "#df8d65"
+    },
+    {
+      "source": "Thomas Wilson",
+      "predicate": "is a",
+      "target": "whaleback freighter",
+      "edgeId": "e65",
+      "color": "#df8d65"
+    },
+    {
+      "source": "115",
+      "predicate": "is a shipwreck on the",
+      "target": "Great Lakes",
+      "edgeId": "e66",
+      "color": "#3333ec"
+    },
+    {
+      "source": "Alexander McDougall",
+      "predicate": "is an",
+      "target": "entrepreneur",
+      "edgeId": "e67",
+      "color": "#a659d7"
+    },
+    {
+      "source": "Alexander McDougall",
+      "predicate": "is an",
+      "target": "inventor",
+      "edgeId": "e68",
+      "color": "#a659d7"
+    },
+    {
+      "source": "St. Marys River",
+      "predicate": "is below",
+      "target": "Sault Ste. Marie Canal",
+      "edgeId": "e69",
+      "color": "#52d6d4"
+    },
+    {
+      "source": "wreck of 115",
+      "predicate": "is the",
+      "target": "115 wreck",
+      "edgeId": "e70",
+      "color": "#1f67c8"
+    },
+    {
+      "source": "whaleback",
+      "predicate": "lacks",
+      "target": "vertical sides (traditional freighters)",
+      "edgeId": "e71",
+      "color": "#4099eb"
+    },
+    {
+      "source": "coordinates 48°41′53″N 86°39′17″W",
+      "predicate": "latitude",
+      "target": "48.69806°N",
+      "edgeId": "e72",
+      "color": "#e970ee"
+    },
+    {
+      "source": "115",
+      "predicate": "loaded",
+      "target": "3,000 tons of iron ore",
+      "edgeId": "e73",
+      "color": "#c9dd46"
+    },
+    {
+      "source": "twisted steel plates",
+      "predicate": "located on",
+      "target": "cliff",
+      "edgeId": "e74",
+      "color": "#35da86"
+    },
+    {
+      "source": "wreck of 115",
+      "predicate": "located on",
+      "target": "rock bottom",
+      "edgeId": "e75",
+      "color": "#35da86"
+    },
+    {
+      "source": "coordinates 48°41′53″N 86°39′17″W",
+      "predicate": "longitude",
+      "target": "86.65472°W",
+      "edgeId": "e76",
+      "color": "#2c34e3"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "made",
+      "target": "makeshift raft",
+      "edgeId": "e77",
+      "color": "#e16230"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "made it home by",
+      "target": "Christmas",
+      "edgeId": "e78",
+      "color": "#249fd8"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "made it to",
+      "target": "Middletown, Ontario",
+      "edgeId": "e79",
+      "color": "#e24242"
+    },
+    {
+      "source": "Pic Island",
+      "predicate": "near",
+      "target": "Marathon, Ontario",
+      "edgeId": "e80",
+      "color": "#67eb32"
+    },
+    {
+      "source": "dry docked in Duluth",
+      "predicate": "occurred in",
+      "target": "Duluth, Minnesota",
+      "edgeId": "e81",
+      "color": "#d99741"
+    },
+    {
+      "source": "dry docked in West Superior",
+      "predicate": "occurred in",
+      "target": "West Superior, Wisconsin",
+      "edgeId": "e82",
+      "color": "#d99741"
+    },
+    {
+      "source": "1894 collision",
+      "predicate": "occurred on",
+      "target": "Lake George",
+      "edgeId": "e83",
+      "color": "#49dced"
+    },
+    {
+      "source": "1897 grounding",
+      "predicate": "occurred on",
+      "target": "St. Marys River",
+      "edgeId": "e84",
+      "color": "#49dced"
+    },
+    {
+      "source": "Colgate Hoyt",
+      "predicate": "proceeded due to",
+      "target": "fuel scarcity",
+      "edgeId": "e85",
+      "color": "#eb5c5c"
+    },
+    {
+      "source": "Colgate Hoyt",
+      "predicate": "proceeded to",
+      "target": "Sault Ste. Marie",
+      "edgeId": "e86",
+      "color": "#d61ea8"
+    },
+    {
+      "source": "Alexander McDougall",
+      "predicate": "promoted using",
+      "target": "Christopher Columbus (excursion liner)",
+      "edgeId": "e87",
+      "color": "#42da9b"
+    },
+    {
+      "source": "115",
+      "predicate": "required replacement of",
+      "target": "hull plates",
+      "edgeId": "e88",
+      "color": "#b633dc"
+    },
+    {
+      "source": "115",
+      "predicate": "required replacement of",
+      "target": "keel plates",
+      "edgeId": "e89",
+      "color": "#b633dc"
+    },
+    {
+      "source": "Alexander McDougall",
+      "predicate": "sent",
+      "target": "Charles W. Wetmore",
+      "edgeId": "e90",
+      "color": "#d123c6"
+    },
+    {
+      "source": "Charles W. Wetmore",
+      "predicate": "sent to",
+      "target": "London",
+      "edgeId": "e91",
+      "color": "#cde55a"
+    },
+    {
+      "source": "dive footage (about 1980)",
+      "predicate": "shows intact",
+      "target": "stern",
+      "edgeId": "e92",
+      "color": "#5aa9e0"
+    },
+    {
+      "source": "dive footage (about 1980)",
+      "predicate": "shows intact",
+      "target": "turrets",
+      "edgeId": "e93",
+      "color": "#5aa9e0"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "stumbled upon",
+      "target": "Canadian Pacific Railway track",
+      "edgeId": "e94",
+      "color": "#7fd23b"
+    },
+    {
+      "source": "cook",
+      "predicate": "suffered",
+      "target": "frostbitten feet",
+      "edgeId": "e95",
+      "color": "#52dfaf"
+    },
+    {
+      "source": "Pickands Mather & Company",
+      "predicate": "took over management of",
+      "target": "American Steel Barge Company fleet",
+      "edgeId": "e96",
+      "color": "#67edc8"
+    },
+    {
+      "source": "115",
+      "predicate": "used",
+      "target": "life raft",
+      "edgeId": "e97",
+      "color": "#2690e2"
+    },
+    {
+      "source": "115",
+      "predicate": "used",
+      "target": "small life raft",
+      "edgeId": "e98",
+      "color": "#2690e2"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "used",
+      "target": "log cabin",
+      "edgeId": "e99",
+      "color": "#2690e2"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "used",
+      "target": "tree branches",
+      "edgeId": "e100",
+      "color": "#2690e2"
+    },
+    {
+      "source": "115",
+      "predicate": "was",
+      "target": "18.75 feet deep",
+      "edgeId": "e101",
+      "color": "#a432cf"
+    },
+    {
+      "source": "115",
+      "predicate": "was",
+      "target": "256 feet long",
+      "edgeId": "e102",
+      "color": "#a432cf"
+    },
+    {
+      "source": "115",
+      "predicate": "was",
+      "target": "36 feet wide",
+      "edgeId": "e103",
+      "color": "#a432cf"
+    },
+    {
+      "source": "115",
+      "predicate": "was",
+      "target": "dry docked in Duluth",
+      "edgeId": "e104",
+      "color": "#a432cf"
+    },
+    {
+      "source": "115",
+      "predicate": "was",
+      "target": "dry docked in West Superior",
+      "edgeId": "e105",
+      "color": "#a432cf"
+    },
+    {
+      "source": "115",
+      "predicate": "was",
+      "target": "enrolled in Duluth",
+      "edgeId": "e106",
+      "color": "#a432cf"
+    },
+    {
+      "source": "115",
+      "predicate": "was",
+      "target": "final shipwreck on the Great Lakes during the 1800s",
+      "edgeId": "e107",
+      "color": "#a432cf"
+    },
+    {
+      "source": "115",
+      "predicate": "was",
+      "target": "launched August 15, 1891",
+      "edgeId": "e108",
+      "color": "#a432cf"
+    },
+    {
+      "source": "wreck of 115",
+      "predicate": "was",
+      "target": "wreck located in 1980",
+      "edgeId": "e109",
+      "color": "#a432cf"
+    },
+    {
+      "source": "115",
+      "predicate": "was an",
+      "target": "unrigged barge",
+      "edgeId": "e110",
+      "color": "#ec1a78"
+    },
+    {
+      "source": "115",
+      "predicate": "was built by",
+      "target": "American Steel Barge Company",
+      "edgeId": "e111",
+      "color": "#32dc52"
+    },
+    {
+      "source": "115",
+      "predicate": "was built for",
+      "target": "McDougall fleet",
+      "edgeId": "e112",
+      "color": "#6297ee"
+    },
+    {
+      "source": "115",
+      "predicate": "was built in",
+      "target": "Superior, Wisconsin",
+      "edgeId": "e113",
+      "color": "#68e68f"
+    },
+    {
+      "source": "115",
+      "predicate": "was built in",
+      "target": "West Superior, Wisconsin",
+      "edgeId": "e114",
+      "color": "#68e68f"
+    },
+    {
+      "source": "wreck of 115",
+      "predicate": "was discovered by",
+      "target": "wreck hunter Ryan LeBlanc",
+      "edgeId": "e115",
+      "color": "#c62cd0"
+    },
+    {
+      "source": "115",
+      "predicate": "was enrolled in",
+      "target": "Duluth, Minnesota",
+      "edgeId": "e116",
+      "color": "#bf4a37"
+    },
+    {
+      "source": "115",
+      "predicate": "was in tow of",
+      "target": "Colgate Hoyt",
+      "edgeId": "e117",
+      "color": "#80ed62"
+    },
+    {
+      "source": "115",
+      "predicate": "was involved in",
+      "target": "1893 collision",
+      "edgeId": "e118",
+      "color": "#b0d878"
+    },
+    {
+      "source": "115",
+      "predicate": "was involved in",
+      "target": "1894 collision",
+      "edgeId": "e119",
+      "color": "#b0d878"
+    },
+    {
+      "source": "115",
+      "predicate": "was involved in",
+      "target": "1897 grounding",
+      "edgeId": "e120",
+      "color": "#b0d878"
+    },
+    {
+      "source": "115",
+      "predicate": "was near",
+      "target": "Sault Ste. Marie",
+      "edgeId": "e121",
+      "color": "#1fe02d"
+    },
+    {
+      "source": "115",
+      "predicate": "was part of",
+      "target": "American Steel Barge Company fleet",
+      "edgeId": "e122",
+      "color": "#71e2a6"
+    },
+    {
+      "source": "bell",
+      "predicate": "was retrieved from",
+      "target": "wreck of 115",
+      "edgeId": "e123",
+      "color": "#c1c636"
+    },
+    {
+      "source": "115",
+      "predicate": "was the",
+      "target": "second whaleback lost on the Great Lakes",
+      "edgeId": "e124",
+      "color": "#72e440"
+    },
+    {
+      "source": "115",
+      "predicate": "was towed by a",
+      "target": "steam-powered ship (towing)",
+      "edgeId": "e125",
+      "color": "#e17d92"
+    },
+    {
+      "source": "Alexander McDougall",
+      "predicate": "was unable to persuade",
+      "target": "shipbuilders",
+      "edgeId": "e126",
+      "color": "#d19051"
+    },
+    {
+      "source": "115",
+      "predicate": "was under the command of",
+      "target": "Arthur A. Boyce",
+      "edgeId": "e127",
+      "color": "#23b4e3"
+    },
+    {
+      "source": "115",
+      "predicate": "was under tow of",
+      "target": "A.D. Thompson",
+      "edgeId": "e128",
+      "color": "#6ef0df"
+    },
+    {
+      "source": "whaleback",
+      "predicate": "were called",
+      "target": "pig boats",
+      "edgeId": "e129",
+      "color": "#a37cde"
+    },
+    {
+      "source": "crew of eight",
+      "predicate": "were located by",
+      "target": "Canadian Pacific Railway",
+      "edgeId": "e130",
+      "color": "#dac865"
+    }
+  ]
+}
+    </script>
+    <script>
+        (function () {
+            console.log('[iframe] Script starting - mobile check:', window.innerWidth <= 768);
+            console.log('[iframe] User agent:', navigator.userAgent);
+
+            const dataElement = document.getElementById('viz-data');
+            if (!dataElement) {
+                console.error('[iframe] viz-data element not found!');
+                return;
+            }
+
+            let vizData;
+            try {
+                vizData = JSON.parse(dataElement.textContent);
+                console.log('[iframe] Data parsed successfully:', vizData.nodes?.length, 'nodes');
+            } catch (e) {
+                console.error('[iframe] Failed to parse data:', e);
+                return;
+            }
+
+            const state = {
+                activeElement: null,
+                focusCluster: null,
+                focusPredicate: null,
+                searchTerm: '',
+                sidebarCollapsed: false,
+                sidebarDisabled: false
+            };
+
+            const nodeById = Object.fromEntries(vizData.nodes.map(node => [node.id, node]));
+            const edgeById = Object.fromEntries(vizData.edges.map(edge => [edge.id, edge]));
+            const clusterById = Object.fromEntries(vizData.clusters.map(cluster => [cluster.id, cluster]));
+            const edgesByPredicate = {};
+            vizData.edges.forEach(edge => {
+                if (!edgesByPredicate[edge.predicate]) {
+                    edgesByPredicate[edge.predicate] = [];
+                }
+                edgesByPredicate[edge.predicate].push(edge.id);
+            });
+
+            const nodesByCluster = {};
+            vizData.clusters.forEach(cluster => {
+                cluster.members.forEach(member => {
+                    if (!nodesByCluster[cluster.id]) {
+                        nodesByCluster[cluster.id] = new Set();
+                    }
+                    nodesByCluster[cluster.id].add(member);
+                });
+            });
+
+            function renderStats() {
+                const grid = document.getElementById('statsGrid');
+                const stats = vizData.stats;
+                const entries = [
+                    { label: 'Entities', value: stats.entities },
+                    { label: 'Relations', value: stats.relations },
+                    { label: 'Relation types', value: stats.relationTypes },
+                    { label: 'Entity clusters', value: stats.entityClusters },
+                    { label: 'Edge clusters', value: stats.edgeClusters },
+                    { label: 'Isolated entities', value: stats.isolatedEntities },
+                    { label: 'Components', value: stats.components },
+                    { label: 'Average degree', value: stats.averageDegree }
+                ];
+                grid.innerHTML = entries
+                    .map(entry => `
+                        <div class="stat-card">
+                            <div class="stat-value">${entry.value}</div>
+                            <div>${entry.label}</div>
+                        </div>
+                    `)
+                    .join('');
+            }
+
+            function renderTopLists() {
+                const topEntitiesContainer = document.getElementById('topEntities');
+                const topRelationsContainer = document.getElementById('topRelations');
+
+                const entityItems = vizData.topEntities.map(item => {
+                    const clusterLabel = item.cluster ? `${item.cluster}` : 'Unclustered';
+                    return `
+                        <div class="list-item">
+                            <div>
+                                <strong>${item.label}</strong>
+                                <div class="meta">Cluster: ${clusterLabel}</div>
+                            </div>
+                            <div>${item.degree}</div>
+                        </div>
+                    `;
+                });
+                topEntitiesContainer.innerHTML = entityItems.join('') || '<div class="meta">No entities</div>';
+
+                const relationItems = vizData.topRelations.map(item => `
+                    <div class="list-item relation-item" data-predicate="${item.predicate}">
+                        <div>
+                            <strong>${item.predicate}</strong>
+                            <div class="meta">${item.count} relations</div>
+                        </div>
+                        <div class="pill" style="background: ${item.color}1a; border: 1px solid ${item.color};">${item.count}</div>
+                    </div>
+                `);
+                topRelationsContainer.innerHTML = relationItems.join('') || '<div class="meta">No relations</div>';
+            }
+
+            function renderClusters() {
+                const container = document.getElementById('clusterList');
+                if (!vizData.clusters.length) {
+                    container.innerHTML = '<div class="meta">No cluster information provided.</div>';
+                    return;
+                }
+                container.innerHTML = vizData.clusters
+                    .map(cluster => `
+                        <button class="list-item cluster-item" data-cluster="${cluster.id}" style="border-left-color: ${cluster.color};">
+                            <div>
+                                <strong>${cluster.label}</strong>
+                                <div class="meta">${cluster.size} members</div>
+                            </div>
+                            <span class="legend-swatch" style="background: ${cluster.color};"></span>
+                        </button>
+                    `)
+                    .join('');
+            }
+
+            // function renderRelationsTable() {
+            //     const tbody = document.getElementById('relationsTable');
+            //     tbody.innerHTML = vizData.relations
+            //         .map(rel => `
+            //             <tr data-edge="${rel.edgeId}">
+            //                 <td>${rel.source}</td>
+            //                 <td><span class="pill" style="border: 1px solid ${rel.color}; background: ${rel.color}1a;">${rel.predicate}</span></td>
+            //                 <td>${rel.target}</td>
+            //             </tr>
+            //         `)
+            //         .join('');
+            // }
+
+            // function renderInsights() {
+            //     const insights = document.getElementById('insightsContent');
+            //     const clusters = vizData.clusters
+            //         .map(cluster => `
+            //             <div class="list-item" style="border-left: 4px solid ${cluster.color};">
+            //                 <div>
+            //                     <strong>${cluster.label}</strong>
+            //                     <div class="meta">Members: ${cluster.members.join(', ')}</div>
+            //                 </div>
+            //                 <div>${cluster.size}</div>
+            //             </div>
+            //         `)
+            //         .join('');
+
+            //     const components = vizData.components
+            //         .map((component, index) => `
+            //             <div class="list-item">
+            //                 <div>
+            //                     <strong>Component ${index + 1}</strong>
+            //                     <div class="meta">${component.members.join(', ')}</div>
+            //                 </div>
+            //                 <div>${component.size}</div>
+            //             </div>
+            //         `)
+            //         .join('');
+
+            //     const isolates = vizData.isolatedEntities.length
+            //         ? vizData.isolatedEntities.join(', ')
+            //         : 'None';
+
+            //     insights.innerHTML = `
+            //         <div class="section">
+            //             <h2>Clusters</h2>
+            //             <div class="list">${clusters || '<div class="meta">No clusters</div>'}</div>
+            //         </div>
+            //         <div class="section">
+            //             <h2>Connected components</h2>
+            //             <div class="list">${components || '<div class="meta">Single connected component</div>'}</div>
+            //         </div>
+            //         <div class="section">
+            //             <h2>Isolated entities</h2>
+            //             <div class="meta">${isolates}</div>
+            //         </div>
+            //     `;
+            // }
+
+            function setActiveElement(element) {
+                state.activeElement = element;
+                renderSelectionDetails();
+                updateHighlights();
+
+                // Notify parent about selection change
+                if (window.parent !== window && state.sidebarDisabled) {
+                    const selection = element ? {
+                        type: element.type,
+                        id: element.id,
+                        ...getElementDetails(element)
+                    } : null;
+                    window.parent.postMessage({
+                        type: 'selectionChanged',
+                        selection: selection
+                    }, '*');
+                }
+            }
+
+            function getElementDetails(element) {
+                if (!element) return {};
+
+                if (element.type === 'node') {
+                    const node = nodeById[element.id];
+                    return {
+                        label: node.label,
+                        cluster: node.cluster,
+                        degree: node.degree,
+                        indegree: node.indegree,
+                        outdegree: node.outdegree,
+                        neighbors: node.neighbors
+                    };
+                } else if (element.type === 'edge') {
+                    const edge = edgeById[element.id];
+                    return {
+                        source: edge.source,
+                        target: edge.target,
+                        predicate: edge.predicate,
+                        cluster: edge.cluster
+                    };
+                }
+                return {};
+            }
+
+            function clearActiveElement() {
+                state.activeElement = null;
+                renderSelectionDetails();
+                updateHighlights();
+            }
+
+            function renderSelectionDetails() {
+                const panel = document.getElementById('selectionDetails');
+                const active = state.activeElement;
+                if (!active) {
+                    panel.innerHTML = 'Click a node or relation in the network to inspect details.';
+                    return;
+                }
+
+                if (active.type === 'node') {
+                    const node = nodeById[active.id];
+                    const cluster = node.cluster ? `Cluster: ${node.cluster}` : 'Unclustered';
+                    const neighbors = node.neighbors.length ? node.neighbors.join(', ') : 'None';
+                    panel.innerHTML = `
+                        <h3>${node.label}</h3>
+                        <ul>
+                            <li>${cluster}</li>
+                            <li>Total degree: ${node.degree}</li>
+                            <li>Outgoing: ${node.outdegree}</li>
+                            <li>Incoming: ${node.indegree}</li>
+                            <li>Neighbors: ${neighbors}</li>
+                        </ul>
+                    `;
+                } else if (active.type === 'edge') {
+                    const edge = edgeById[active.id];
+                    const cluster = edge.cluster ? `Cluster: ${edge.cluster}` : 'Unclustered';
+                    panel.innerHTML = `
+                        <h3>${edge.source} → ${edge.target}</h3>
+                        <ul>
+                            <li>Relation: ${edge.predicate}</li>
+                            <li>${cluster}</li>
+                        </ul>
+                    `;
+                }
+            }
+
+            function toggleClusterFocus(clusterId) {
+                if (state.focusCluster === clusterId) {
+                    state.focusCluster = null;
+                } else {
+                    state.focusCluster = clusterId;
+                }
+                updateActiveButtons();
+                updateHighlights();
+            }
+
+            function togglePredicateFocus(predicate) {
+                if (state.focusPredicate === predicate) {
+                    state.focusPredicate = null;
+                } else {
+                    state.focusPredicate = predicate;
+                }
+                updateActiveButtons();
+                updateHighlights();
+            }
+
+            function toggleEntityFocus(id) {
+                if (state.activeElement?.id === id) {
+                    setActiveElement(null);
+                } else {
+                    setActiveElement({ type: 'node', id: id });
+                }
+            }
+
+            function updateActiveButtons() {
+                document.querySelectorAll('.cluster-item').forEach(item => {
+                    const clusterId = item.getAttribute('data-cluster');
+                    item.classList.toggle('active', state.focusCluster === clusterId);
+                });
+                document.querySelectorAll('.relation-item').forEach(item => {
+                    const predicate = item.getAttribute('data-predicate');
+                    item.classList.toggle('active', state.focusPredicate === predicate);
+                });
+            }
+
+            // Canvas-based network visualization
+            let canvas, ctx, transform, simulation;
+            let nodes, edges;
+            let highlightedNodes = new Set();
+            let highlightedEdges = new Set();
+            let isFiltering = false;
+
+            function createNetwork() {
+                console.log('[iframe] createNetwork starting...');
+
+                if (typeof d3 === 'undefined') {
+                    console.error('[iframe] D3.js not loaded!');
+                    return;
+                }
+                console.log('[iframe] D3.js version:', d3.version);
+
+                canvas = document.getElementById('networkCanvas');
+                if (!canvas) {
+                    console.error('[iframe] Canvas element not found!');
+                    return;
+                }
+
+                ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    console.error('[iframe] Canvas context not available!');
+                    return;
+                }
+
+                // Force a layout recalculation to ensure proper sizing
+                canvas.offsetHeight; // Trigger reflow
+
+                // Set canvas size with device pixel ratio for crisp rendering
+                const rect = canvas.getBoundingClientRect();
+                console.log('[iframe] Canvas rect:', rect.width, 'x', rect.height);
+
+                // Ensure minimum size for mobile/narrow viewports
+                const width = Math.max(rect.width, 320);
+                const height = Math.max(rect.height, 200);
+
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.scale(dpr, dpr);
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+
+                // Initialize transform for zooming/panning
+                transform = d3.zoomIdentity;
+
+                // Clone data for simulation
+                nodes = vizData.nodes.map(node => ({ ...node }));
+                edges = vizData.edges.map(edge => ({ ...edge }));
+
+                // Mouse interaction handling
+                let draggedNode = null;
+                let isDraggingNode = false;
+                let mouseX, mouseY;
+                let mouseDownPos = null;
+                let isMouseDown = false;
+                const DRAG_THRESHOLD = 10; // pixels - minimum movement to start dragging
+
+                // Create D3 force simulation
+                simulation = d3
+                    .forceSimulation(nodes)
+                    .force('link', d3.forceLink(edges).id(d => d.id).distance(120).strength(0.3))
+                    .force('charge', d3.forceManyBody().strength(-280))
+                    .force('center', d3.forceCenter(width / 2, height / 2))
+                    .force('collision', d3.forceCollide().radius(d => d.radius + 12));
+
+                // Set up zoom behavior with conditional activation
+                const zoom = d3.zoom()
+                    .scaleExtent([0.25, 3])
+                    .on('zoom', (event) => {
+                        // Apply zoom only if not dragging a node
+                        if (!isDraggingNode) {
+                            transform = event.transform;
+                            render();
+                        }
+                    })
+                    .filter((event) => {
+                        // Allow zoom with mouse wheel or when no node under cursor
+                        if (event.type === 'wheel') return true;
+                        if (event.type === 'mousedown' && event.button === 0) {
+                            const pos = getMousePos(event);
+                            const node = findNode(pos.x, pos.y);
+                            return !node;
+                        }
+                        return true;
+                    });
+
+                d3.select(canvas).call(zoom);
+
+                // Set initial zoom level
+                zoom.scaleTo(d3.select(canvas), 0.5);
+
+                function getMousePos(event) {
+                    const rect = canvas.getBoundingClientRect();
+                    return {
+                        x: (event.clientX - rect.left - transform.x) / transform.k,
+                        y: (event.clientY - rect.top - transform.y) / transform.k
+                    };
+                }
+
+                function findNode(x, y) {
+                    for (let i = nodes.length - 1; i >= 0; i--) {
+                        const node = nodes[i];
+                        const dx = x - node.x;
+                        const dy = y - node.y;
+                        if (dx * dx + dy * dy < node.radius * node.radius) {
+                            return node;
+                        }
+                    }
+                    return null;
+                }
+
+                function findEdge(x, y) {
+                    for (let i = edges.length - 1; i >= 0; i--) {
+                        const edge = edges[i];
+                        if (!edge.source || !edge.target) continue;
+
+                        // Check if click is near the edge line
+                        const dx = edge.target.x - edge.source.x;
+                        const dy = edge.target.y - edge.source.y;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        if (length === 0) continue;
+
+                        const dot = ((x - edge.source.x) * dx + (y - edge.source.y) * dy) / (length * length);
+                        if (dot < 0 || dot > 1) continue;
+
+                        const projX = edge.source.x + dot * dx;
+                        const projY = edge.source.y + dot * dy;
+                        const distSq = (x - projX) * (x - projX) + (y - projY) * (y - projY);
+
+                        if (distSq < 25) { // 5px threshold
+                            return edge;
+                        }
+                    }
+                    return null;
+                }
+
+                // Prevent context menu on right click
+                canvas.addEventListener('contextmenu', (event) => {
+                    event.preventDefault();
+                    return false;
+                });
+
+                canvas.addEventListener('mousedown', (event) => {
+                    // Allow event only for primary button (left click)
+                    if (event.button !== 0) return;
+
+                    const pos = getMousePos(event);
+                    mouseX = pos.x;
+                    mouseY = pos.y;
+                    mouseDownPos = { x: pos.x, y: pos.y };
+                    isMouseDown = true;
+                    draggedNode = findNode(pos.x, pos.y);
+
+                    if (draggedNode) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        // Don't start dragging immediately - wait for movement
+                        canvas.style.cursor = 'grabbing';
+                    }
+                });
+
+                canvas.addEventListener('mousemove', (event) => {
+                    // Allow event only for primary button (left click)
+                    if (event.button !== 0) return;
+                    const pos = getMousePos(event);
+
+                    if (draggedNode && isDraggingNode) {
+                        // Already dragging - continue moving the node
+                        draggedNode.fx = pos.x;
+                        draggedNode.fy = pos.y;
+                    } else if (draggedNode && isMouseDown && mouseDownPos) {
+                        // Check if mouse moved enough to start dragging
+                        const dx = pos.x - mouseDownPos.x;
+                        const dy = pos.y - mouseDownPos.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance > DRAG_THRESHOLD) {
+                            // Start dragging
+                            isDraggingNode = true;
+                            simulation.alphaTarget(0.1).restart();
+                            draggedNode.fx = draggedNode.x;
+                            draggedNode.fy = draggedNode.y;
+                        }
+                    } else if (!isDraggingNode && !isMouseDown) {
+                        // Update cursor based on what's under mouse
+                        const node = findNode(pos.x, pos.y);
+                        const edge = findEdge(pos.x, pos.y);
+                        canvas.style.cursor = (node || edge) ? 'pointer' : 'grab';
+                    }
+                });
+
+                canvas.addEventListener('mouseup', (event) => {
+                    // Allow event only for primary button (left click)
+                    if (event.button !== 0) return;
+
+                    if (draggedNode) {
+                        if (isDraggingNode) {
+                            // Was actually dragging - stop the drag
+                            simulation.alphaTarget(0);
+                            draggedNode.fx = null;
+                            draggedNode.fy = null;
+                        }
+                        // Reset node reference
+                        draggedNode = null;
+                        canvas.style.cursor = 'grab';
+                    }
+
+                    // Reset all mouse states
+                    isMouseDown = false;
+                    isDraggingNode = false;
+                    mouseDownPos = null;
+                });
+
+                canvas.addEventListener('click', (event) => {
+                    // Only handle click if we weren't dragging
+                    if (isDraggingNode) return;
+
+                    const pos = getMousePos(event);
+                    const node = findNode(pos.x, pos.y);
+                    const edge = findEdge(pos.x, pos.y);
+
+                    if (node) {
+                        setActiveElement({ type: 'node', id: node.id });
+                    } else if (edge) {
+                        setActiveElement({ type: 'edge', id: edge.id });
+                    } else {
+                        clearActiveElement();
+                    }
+                });
+
+                // Animation loop
+                simulation.on('tick', () => {
+                    // Avoid nodes to be re-rendered all time, just re-render when moving
+                    if (isDraggingNode) {
+                        render();
+                    }
+                });
+
+                // Handle window resize
+                window.addEventListener('resize', resizeCanvas);
+
+                render();
+            }
+
+            function resizeCanvas() {
+                if (!canvas || !ctx) return;
+
+                // Force canvas to take full container size
+                if (state.sidebarDisabled) {
+                    canvas.style.width = '100%';
+                    canvas.style.height = '100%';
+                }
+
+                const rect = canvas.getBoundingClientRect();
+                console.log('Canvas resize - rect:', rect.width, 'x', rect.height);
+
+                // Ensure minimum size for mobile
+                const width = Math.max(rect.width, 320);
+                const height = Math.max(rect.height, 200);
+
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.scale(dpr, dpr);
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+
+                // Update simulation center
+                if (simulation) {
+                    simulation.force('center', d3.forceCenter(width / 2, height / 2));
+                    simulation.alpha(0.3).restart();
+                }
+
+                render();
+            }
+
+
+            function render() {
+                if (!ctx || !canvas) return;
+
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1),
+                    canvas.height / (window.devicePixelRatio || 1));
+
+                // Apply transform
+                ctx.save();
+                ctx.translate(transform.x, transform.y);
+                ctx.scale(transform.k, transform.k);
+
+                // Set text properties
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = '12px Inter, system-ui, sans-serif';
+
+                // Draw edges first
+                edges.forEach(edge => {
+                    if (!edge.source || !edge.target) return;
+
+                    const isHighlighted = highlightedEdges.has(edge.id);
+                    const isDimmed = isFiltering && !isHighlighted;
+
+                    // Calculate edge endpoints accounting for node radius
+                    const dx = edge.target.x - edge.source.x;
+                    const dy = edge.target.y - edge.source.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const normX = dx / distance;
+                    const normY = dy / distance;
+
+                    const sourcePadding = edge.source.radius + 2;
+                    const targetPadding = edge.target.radius + 8;
+                    const sourceX = edge.source.x + normX * sourcePadding;
+                    const sourceY = edge.source.y + normY * sourcePadding;
+                    const targetX = edge.target.x - normX * targetPadding;
+                    const targetY = edge.target.y - normY * targetPadding;
+
+                    // Draw edge line
+                    ctx.strokeStyle = edge.color;
+                    ctx.globalAlpha = isDimmed ? 0.15 : (isHighlighted ? 1.0 : 0.55);
+                    ctx.lineWidth = 1.4;
+                    ctx.beginPath();
+                    ctx.moveTo(sourceX, sourceY);
+                    ctx.lineTo(targetX, targetY);
+                    ctx.stroke();
+
+                    // Draw arrowhead
+                    const arrowLength = 12;
+                    const arrowWidth = 24;
+                    const angle = Math.atan2(dy, dx);
+
+                    ctx.fillStyle = edge.color;
+                    ctx.beginPath();
+                    ctx.moveTo(targetX, targetY);
+                    ctx.lineTo(
+                        targetX - arrowLength * Math.cos(angle - arrowWidth * Math.PI / 180),
+                        targetY - arrowLength * Math.sin(angle - arrowWidth * Math.PI / 180)
+                    );
+                    ctx.lineTo(
+                        targetX - arrowLength * Math.cos(angle + arrowWidth * Math.PI / 180),
+                        targetY - arrowLength * Math.sin(angle + arrowWidth * Math.PI / 180)
+                    );
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Draw edge label if zoom level is appropriate
+                    if (transform.k > 0.8) {
+                        const labelX = (sourceX + targetX) / 2;
+                        const labelY = (sourceY + targetY) / 2;
+
+                        ctx.fillStyle = isDimmed ? 'rgba(30, 41, 59, 0.15)' : 'rgba(30, 41, 59, 0.8)';
+                        ctx.font = '10px Inter, system-ui, sans-serif';
+                        ctx.fillText(edge.predicate, labelX, labelY);
+                    }
+                });
+
+                // Draw nodes
+                nodes.forEach(node => {
+                    const isHighlighted = highlightedNodes.has(node.id);
+                    const isDimmed = isFiltering && !isHighlighted;
+
+                    // Draw node circle
+                    ctx.fillStyle = node.color;
+                    ctx.globalAlpha = isDimmed ? 0.15 : 1.0;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.radius, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    // Draw node border
+                    ctx.strokeStyle = '#0f172a';
+                    ctx.lineWidth = isHighlighted ? 2.4 : 1.2;
+                    ctx.stroke();
+
+                    // Draw node label
+                    if (transform.k > 0.5) {
+                        ctx.fillStyle = isDimmed ? 'rgba(15, 23, 42, 0.15)' : '#0f172a';
+                        ctx.font = '12px Inter, system-ui, sans-serif';
+                        ctx.fillText(node.label, node.x, node.y + node.radius + 14);
+                    }
+                });
+
+                ctx.restore();
+                ctx.globalAlpha = 1.0;
+            }
+
+            function updateHighlights() {
+                // Clear previous highlights
+                highlightedNodes.clear();
+                highlightedEdges.clear();
+                isFiltering = false;
+
+                const addNode = id => {
+                    if (id) {
+                        highlightedNodes.add(id);
+                    }
+                };
+                const addEdge = id => {
+                    if (id) {
+                        highlightedEdges.add(id);
+                    }
+                };
+
+                if (state.activeElement) {
+                    isFiltering = true;
+                    if (state.activeElement.type === 'node') {
+                        const node = nodeById[state.activeElement.id];
+                        addNode(node.id);
+                        node.neighbors.forEach(addNode);
+                        (node.edgeIds.outgoing || []).forEach(addEdge);
+                        (node.edgeIds.incoming || []).forEach(addEdge);
+                    } else if (state.activeElement.type === 'edge') {
+                        const edge = edgeById[state.activeElement.id];
+                        addEdge(edge.id);
+                        addNode(edge.source);
+                        addNode(edge.target);
+                    }
+                }
+
+                if (state.focusCluster && nodesByCluster[state.focusCluster]) {
+                    isFiltering = true;
+                    nodesByCluster[state.focusCluster].forEach(addNode);
+                    vizData.edges.forEach(edge => {
+                        if (
+                            nodesByCluster[state.focusCluster].has(edge.source) &&
+                            nodesByCluster[state.focusCluster].has(edge.target)
+                        ) {
+                            addEdge(edge.id);
+                        }
+                    });
+                }
+
+                if (state.focusPredicate && edgesByPredicate[state.focusPredicate]) {
+                    isFiltering = true;
+                    edgesByPredicate[state.focusPredicate].forEach(edgeId => {
+                        addEdge(edgeId);
+                        const edge = edgeById[edgeId];
+                        addNode(edge.source);
+                        addNode(edge.target);
+                    });
+                }
+
+                if (state.searchTerm) {
+                    const term = state.searchTerm.toLowerCase();
+                    isFiltering = true;
+                    vizData.nodes.forEach(node => {
+                        if (node.label.toLowerCase().includes(term)) {
+                            addNode(node.id);
+                            node.neighbors.forEach(addNode);
+                        }
+                    });
+                    vizData.edges.forEach(edge => {
+                        if (edge.predicate.toLowerCase().includes(term)) {
+                            addEdge(edge.id);
+                            addNode(edge.source);
+                            addNode(edge.target);
+                        }
+                    });
+                }
+
+                // Trigger re-render with updated highlights
+                render();
+            }
+
+            function toggleSidebar() {
+                if (state.sidebarDisabled) return;
+
+                state.sidebarCollapsed = !state.sidebarCollapsed;
+                const layout = document.querySelector('.layout');
+                const sidebar = document.querySelector('.sidebar');
+                const toggleButton = document.getElementById('sidebarToggle');
+
+                layout.classList.toggle('sidebar-collapsed', state.sidebarCollapsed);
+                sidebar.classList.toggle('collapsed', state.sidebarCollapsed);
+                toggleButton.classList.toggle('collapsed', state.sidebarCollapsed);
+
+                // Trigger canvas resize when sidebar toggles
+                setTimeout(() => {
+                    resizeCanvas();
+                }, 300); // Wait for transition to complete
+            }
+
+            function disableSidebar() {
+                state.sidebarDisabled = true;
+
+                const layout = document.querySelector('.layout');
+                const sidebar = document.querySelector('.sidebar');
+                const toggleButton = document.getElementById('sidebarToggle');
+                const main = document.querySelector('.main');
+                const tabPanel = document.querySelector('.tab-panel');
+                const networkPanel = document.querySelector('.network-panel');
+
+                layout.classList.add('sidebar-disabled');
+                sidebar.style.display = 'none';
+                toggleButton.style.display = 'none';
+
+                // Force styles directly for iframe context
+                main.style.width = '100%';
+                main.style.height = '100vh';
+                tabPanel.style.padding = '0';
+                tabPanel.style.width = '100%';
+                tabPanel.style.height = '100vh';
+                networkPanel.style.width = '100%';
+                networkPanel.style.height = '100vh';
+                networkPanel.style.borderRadius = '0';
+                networkPanel.style.border = 'none';
+
+                console.log('Sidebar disabled, forcing full width styles');
+
+                // Multiple resize attempts with forced reflow
+                setTimeout(() => {
+                    canvas.offsetHeight; // Trigger reflow
+                    console.log('First resize attempt after 200ms');
+                    resizeCanvas();
+                }, 200);
+
+                setTimeout(() => {
+                    canvas.offsetHeight; // Trigger reflow
+                    console.log('Second resize attempt after 500ms');
+                    resizeCanvas();
+                }, 500);
+
+                setTimeout(() => {
+                    canvas.offsetHeight; // Trigger reflow
+                    console.log('Final resize attempt after 800ms');
+                    resizeCanvas();
+                }, 800);
+
+                // Notify parent about graph data
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'graphDataReady',
+                        data: vizData
+                    }, '*');
+                }
+            }
+
+            function bindInteractions() {
+                document.querySelectorAll('.cluster-item').forEach(item => {
+                    item.addEventListener('click', () => toggleClusterFocus(item.getAttribute('data-cluster')));
+                });
+
+                document.querySelectorAll('.relation-item').forEach(item => {
+                    item.addEventListener('click', () => togglePredicateFocus(item.getAttribute('data-predicate')));
+                });
+
+                // document.getElementById('relationsTable').addEventListener('click', event => {
+                //     const row = event.target.closest('tr');
+                //     if (!row) {
+                //         return;
+                //     }
+                //     const edgeId = row.getAttribute('data-edge');
+                //     if (edgeId) {
+                //         setActiveElement({ type: 'edge', id: edgeId });
+                //     }
+                // });
+
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('input', () => {
+                    state.searchTerm = searchInput.value.trim();
+                    updateHighlights();
+
+                    // Notify parent about search change
+                    if (window.parent !== window && state.sidebarDisabled) {
+                        window.parent.postMessage({
+                            type: 'searchChanged',
+                            searchTerm: state.searchTerm
+                        }, '*');
+                    }
+                });
+                searchInput.addEventListener('keydown', event => {
+                    if (event.key === 'Escape') {
+                        searchInput.value = '';
+                        state.searchTerm = '';
+                        updateHighlights();
+                    }
+                });
+
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', event => {
+                        const target = event.currentTarget;
+                        document.querySelectorAll('.tab').forEach(button => button.classList.remove('active'));
+                        target.classList.add('active');
+                        const tabId = target.getAttribute('data-tab');
+                        document.querySelectorAll('.tab-panel').forEach(panel => {
+                            panel.classList.toggle('active', panel.id === tabId);
+                        });
+                    });
+                });
+
+                document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+
+                // Listen for messages from parent
+                window.addEventListener('message', (event) => {
+                    if (event.data.type === 'disableInternalSidebar') {
+                        disableSidebar();
+                    } else if (event.data.type === 'search') {
+                        state.searchTerm = event.data.term || '';
+                        updateHighlights();
+                    } else if (event.data.type === 'focusCluster') {
+                        toggleClusterFocus(event.data.clusterId);
+                    } else if (event.data.type === 'focusPredicate') {
+                        togglePredicateFocus(event.data.predicate);
+                    } else if (event.data.type === 'focusEntity') {
+                        toggleEntityFocus(event.data.id);
+                    }
+                });
+
+            }
+
+            renderStats();
+            renderTopLists();
+            renderClusters();
+            // renderRelationsTable();
+            // renderInsights();
+
+            // Delay network creation to ensure proper layout
+            setTimeout(() => {
+                createNetwork();
+                bindInteractions();
+            }, 100);
+        })();
+    </script>
+</body>
+
+</html>

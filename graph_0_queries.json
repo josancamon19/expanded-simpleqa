@@ -1,0 +1,202 @@
+[
+  {
+    "question": "Who was born in 1847 and was known for their contributions to education?",
+    "answer": "Brother Azarias",
+    "metadata": {
+      "query_type": "biographical",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Brother Azarias",
+          "predicate": "born in",
+          "object": "1847"
+        },
+        {
+          "subject": "Brother Azarias",
+          "predicate": "was an",
+          "object": "educator"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Which educator, significant in the 19th century, was born in the year 1847?",
+    "answer": "Brother Azarias",
+    "metadata": {
+      "query_type": "biographical",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Brother Azarias",
+          "predicate": "born in",
+          "object": "1847"
+        },
+        {
+          "subject": "Brother Azarias",
+          "predicate": "was an",
+          "object": "educator"
+        }
+      ]
+    }
+  },
+  {
+    "question": "What is the name of the person who was both an educator and born in 1847?",
+    "answer": "Brother Azarias",
+    "metadata": {
+      "query_type": "biographical",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Brother Azarias",
+          "predicate": "born in",
+          "object": "1847"
+        },
+        {
+          "subject": "Brother Azarias",
+          "predicate": "was an",
+          "object": "educator"
+        }
+      ]
+    }
+  },
+  {
+    "question": "What title is held by William Bebb in the state of Ohio?",
+    "answer": "Governor of Ohio",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Governor of Ohio",
+          "predicate": "held by",
+          "object": "William Bebb"
+        },
+        {
+          "subject": "Governor of Ohio",
+          "predicate": "is a",
+          "object": "Governor (office)"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Which government position is classified as a leadership role in Ohio?",
+    "answer": "Governor of Ohio",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Governor of Ohio",
+          "predicate": "held by",
+          "object": "William Bebb"
+        },
+        {
+          "subject": "Governor of Ohio",
+          "predicate": "is a",
+          "object": "Governor (office)"
+        }
+      ]
+    }
+  },
+  {
+    "question": "What is the official title of the person who leads the executive branch of Ohio's government?",
+    "answer": "Governor of Ohio",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Governor of Ohio",
+          "predicate": "held by",
+          "object": "William Bebb"
+        },
+        {
+          "subject": "Governor of Ohio",
+          "predicate": "is a",
+          "object": "Governor (office)"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Who is a member of the Democratic Party and has served as Governor of New Hampshire starting June 3?",
+    "answer": "Jared W. Williams",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Jared W. Williams",
+          "predicate": "member of",
+          "object": "Democratic Party"
+        },
+        {
+          "subject": "Governor of New Hampshire",
+          "predicate": "held by (starting June 3)",
+          "object": "Jared W. Williams"
+        }
+      ]
+    }
+  },
+  {
+    "question": "What individual is known for holding the office of Governor of New Hampshire since June 3?",
+    "answer": "Jared W. Williams",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Jared W. Williams",
+          "predicate": "member of",
+          "object": "Democratic Party"
+        },
+        {
+          "subject": "Governor of New Hampshire",
+          "predicate": "held by (starting June 3)",
+          "object": "Jared W. Williams"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Which person is associated with the Democratic Party and has held the position of Governor of New Hampshire?",
+    "answer": "Jared W. Williams",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Jared W. Williams",
+          "predicate": "member of",
+          "object": "Democratic Party"
+        },
+        {
+          "subject": "Governor of New Hampshire",
+          "predicate": "held by (starting June 3)",
+          "object": "Jared W. Williams"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Who was a prominent leader in the woman's suffrage movement and was born in 1847?",
+    "answer": "Victoria Woodhull",
+    "metadata": {
+      "query_type": "biographical",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Victoria Woodhull",
+          "predicate": "leader of",
+          "object": "woman's suffrage movement"
+        },
+        {
+          "subject": "Victoria Woodhull",
+          "predicate": "born in",
+          "object": "1847"
+        }
+      ]
+    }
+  }
+]
