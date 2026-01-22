@@ -1,78 +1,258 @@
 [
   {
-    "question": "Who was born in 1847 and was known for their contributions to education?",
-    "answer": "Brother Azarias",
+    "question": "What title was held by individuals who served in the United States Congress during the 29th and 30th Congresses, which included events from the year 1847?",
+    "answer": "United States Senator",
     "metadata": {
-      "query_type": "biographical",
+      "query_type": "factual",
       "graph_idx": 0,
       "supporting_facts": [
         {
-          "subject": "Brother Azarias",
-          "predicate": "born in",
-          "object": "1847"
+          "subject": "James Taliaferro",
+          "predicate": "was a",
+          "object": "United States Senator"
         },
         {
-          "subject": "Brother Azarias",
-          "predicate": "was an",
-          "object": "educator"
+          "subject": "William V. Allen",
+          "predicate": "was a",
+          "object": "United States Senator"
+        },
+        {
+          "subject": "John D. Works",
+          "predicate": "was a",
+          "object": "United States Senator"
+        },
+        {
+          "subject": "Francis S. White",
+          "predicate": "was a",
+          "object": "United States Senator"
+        },
+        {
+          "subject": "William O'Connell Bradley",
+          "predicate": "was a",
+          "object": "United States Senator"
         }
       ]
     }
   },
   {
-    "question": "Which educator, significant in the 19th century, was born in the year 1847?",
-    "answer": "Brother Azarias",
+    "question": "What was the designation of the United States Congress that succeeded the 29th Congress and convened in 1847?",
+    "answer": "30th United States Congress",
     "metadata": {
-      "query_type": "biographical",
+      "query_type": "factual",
       "graph_idx": 0,
       "supporting_facts": [
         {
-          "subject": "Brother Azarias",
-          "predicate": "born in",
-          "object": "1847"
+          "subject": "30th United States Congress",
+          "predicate": "succeeded",
+          "object": "29th United States Congress"
         },
         {
-          "subject": "Brother Azarias",
-          "predicate": "was an",
-          "object": "educator"
+          "subject": "29th United States Congress",
+          "predicate": "preceded",
+          "object": "30th United States Congress"
+        },
+        {
+          "subject": "United States Congress",
+          "predicate": "included",
+          "object": "30th United States Congress"
         }
       ]
     }
   },
   {
-    "question": "What is the name of the person who was both an educator and born in 1847?",
-    "answer": "Brother Azarias",
+    "question": "Which group of American pioneers became snowbound in the Sierra Nevada while attempting to reach California in the winter of 1846-1847 and resorted to cannibalism for survival?",
+    "answer": "Donner Party",
     "metadata": {
-      "query_type": "biographical",
+      "query_type": "factual",
       "graph_idx": 0,
       "supporting_facts": [
         {
-          "subject": "Brother Azarias",
-          "predicate": "born in",
-          "object": "1847"
+          "subject": "Donner Party",
+          "predicate": "became snowbound in",
+          "object": "Sierra Nevada"
         },
         {
-          "subject": "Brother Azarias",
-          "predicate": "was an",
-          "object": "educator"
+          "subject": "Donner Party",
+          "predicate": "was bound for",
+          "object": "California"
+        },
+        {
+          "subject": "Donner Party",
+          "predicate": "resorted to",
+          "object": "cannibalism"
+        },
+        {
+          "subject": "First Relief",
+          "predicate": "attempted to rescue",
+          "object": "Donner Party"
         }
       ]
     }
   },
   {
-    "question": "What title is held by William Bebb in the state of Ohio?",
-    "answer": "Governor of Ohio",
+    "question": "Who was the political officeholder in Tennessee that served as governor during the year when the United States was involved in the Mexican-American War, specifically until October 17, 1847?",
+    "answer": "Aaron V. Brown",
     "metadata": {
       "query_type": "affiliation",
       "graph_idx": 0,
       "supporting_facts": [
         {
-          "subject": "Governor of Ohio",
-          "predicate": "held by",
-          "object": "William Bebb"
+          "subject": "Governor of Tennessee",
+          "predicate": "held by (until October 17)",
+          "object": "Aaron V. Brown"
         },
         {
-          "subject": "Governor of Ohio",
+          "subject": "Governor of Tennessee",
+          "predicate": "is a",
+          "object": "Governor (office)"
+        },
+        {
+          "subject": "Governor of Tennessee",
+          "predicate": "held by (starting October 17)",
+          "object": "Neill S. Brown"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Who held the office of Governor in Alabama right after Joshua L. Martin served until December 16, 1847?",
+    "answer": "Governor of Alabama",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Governor of Alabama",
+          "predicate": "held by (starting December 16)",
+          "object": "Reuben Chapman"
+        },
+        {
+          "subject": "Governor of Alabama",
+          "predicate": "held by (until December 16)",
+          "object": "Joshua L. Martin"
+        },
+        {
+          "subject": "Governor of Alabama",
+          "predicate": "is a",
+          "object": "Governor (office)"
+        },
+        {
+          "subject": "Reuben Chapman",
+          "predicate": "elected as",
+          "object": "Governor of Alabama"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Which political party did Robert Charles Winthrop belong to while serving as the Speaker of the House of Representatives in the United States in 1847?",
+    "answer": "Whig Party",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "William Alexander Graham",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Robert Charles Winthrop",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "William Bebb",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Elisha Harris",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "George W. Crawford",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Charles J. McCurdy",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "John Young",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Archibald Dixon",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "William Owsley",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "William Temple",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Trasimond Landry",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Neill S. Brown",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Charles C. Stratton",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Clark Bissell",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Horace Eaton",
+          "predicate": "member of",
+          "object": "Whig Party"
+        },
+        {
+          "subject": "Leonard Sargeant",
+          "predicate": "member of",
+          "object": "Whig Party"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Who held the position of the state's chief executive in Connecticut during the transition from Isaac Toucey to Clark Bissell in 1847?",
+    "answer": "Governor of Connecticut",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Governor of Connecticut",
+          "predicate": "held by (until May 5)",
+          "object": "Isaac Toucey"
+        },
+        {
+          "subject": "Governor of Connecticut",
+          "predicate": "held by (starting May 5)",
+          "object": "Clark Bissell"
+        },
+        {
+          "subject": "Governor of Connecticut",
           "predicate": "is a",
           "object": "Governor (office)"
         }
@@ -80,121 +260,76 @@
     }
   },
   {
-    "question": "Which government position is classified as a leadership role in Ohio?",
-    "answer": "Governor of Ohio",
-    "metadata": {
-      "query_type": "affiliation",
-      "graph_idx": 0,
-      "supporting_facts": [
-        {
-          "subject": "Governor of Ohio",
-          "predicate": "held by",
-          "object": "William Bebb"
-        },
-        {
-          "subject": "Governor of Ohio",
-          "predicate": "is a",
-          "object": "Governor (office)"
-        }
-      ]
-    }
-  },
-  {
-    "question": "What is the official title of the person who leads the executive branch of Ohio's government?",
-    "answer": "Governor of Ohio",
-    "metadata": {
-      "query_type": "affiliation",
-      "graph_idx": 0,
-      "supporting_facts": [
-        {
-          "subject": "Governor of Ohio",
-          "predicate": "held by",
-          "object": "William Bebb"
-        },
-        {
-          "subject": "Governor of Ohio",
-          "predicate": "is a",
-          "object": "Governor (office)"
-        }
-      ]
-    }
-  },
-  {
-    "question": "Who is a member of the Democratic Party and has served as Governor of New Hampshire starting June 3?",
-    "answer": "Jared W. Williams",
-    "metadata": {
-      "query_type": "affiliation",
-      "graph_idx": 0,
-      "supporting_facts": [
-        {
-          "subject": "Jared W. Williams",
-          "predicate": "member of",
-          "object": "Democratic Party"
-        },
-        {
-          "subject": "Governor of New Hampshire",
-          "predicate": "held by (starting June 3)",
-          "object": "Jared W. Williams"
-        }
-      ]
-    }
-  },
-  {
-    "question": "What individual is known for holding the office of Governor of New Hampshire since June 3?",
-    "answer": "Jared W. Williams",
-    "metadata": {
-      "query_type": "affiliation",
-      "graph_idx": 0,
-      "supporting_facts": [
-        {
-          "subject": "Jared W. Williams",
-          "predicate": "member of",
-          "object": "Democratic Party"
-        },
-        {
-          "subject": "Governor of New Hampshire",
-          "predicate": "held by (starting June 3)",
-          "object": "Jared W. Williams"
-        }
-      ]
-    }
-  },
-  {
-    "question": "Which person is associated with the Democratic Party and has held the position of Governor of New Hampshire?",
-    "answer": "Jared W. Williams",
-    "metadata": {
-      "query_type": "affiliation",
-      "graph_idx": 0,
-      "supporting_facts": [
-        {
-          "subject": "Jared W. Williams",
-          "predicate": "member of",
-          "object": "Democratic Party"
-        },
-        {
-          "subject": "Governor of New Hampshire",
-          "predicate": "held by (starting June 3)",
-          "object": "Jared W. Williams"
-        }
-      ]
-    }
-  },
-  {
-    "question": "Who was a prominent leader in the woman's suffrage movement and was born in 1847?",
-    "answer": "Victoria Woodhull",
+    "question": "Who was the United States Senator from Alabama that was born in 1847?",
+    "answer": "Francis S. White",
     "metadata": {
       "query_type": "biographical",
       "graph_idx": 0,
       "supporting_facts": [
         {
-          "subject": "Victoria Woodhull",
-          "predicate": "leader of",
-          "object": "woman's suffrage movement"
+          "subject": "Francis S. White",
+          "predicate": "was United States Senator from",
+          "object": "Alabama"
         },
         {
-          "subject": "Victoria Woodhull",
+          "subject": "Francis S. White",
           "predicate": "born in",
           "object": "1847"
+        },
+        {
+          "subject": "Francis S. White",
+          "predicate": "was a",
+          "object": "United States Senator"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Who was the head of the executive branch of Georgia during the transition from George W. Crawford to George W. Towns in 1847?",
+    "answer": "Governor of Georgia",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Governor of Georgia",
+          "predicate": "is a",
+          "object": "Governor (office)"
+        },
+        {
+          "subject": "Governor of Georgia",
+          "predicate": "held by (starting November 3)",
+          "object": "George W. Towns"
+        },
+        {
+          "subject": "Governor of Georgia",
+          "predicate": "held by (until November 3)",
+          "object": "George W. Crawford"
+        }
+      ]
+    }
+  },
+  {
+    "question": "Who held the office of Governor in the state of Maine from 1847 until May 12 of that year?",
+    "answer": "Governor of Maine",
+    "metadata": {
+      "query_type": "affiliation",
+      "graph_idx": 0,
+      "supporting_facts": [
+        {
+          "subject": "Governor of Maine",
+          "predicate": "is a",
+          "object": "Governor (office)"
+        },
+        {
+          "subject": "Governor of Maine",
+          "predicate": "held by (starting May 12)",
+          "object": "John W. Dana"
+        },
+        {
+          "subject": "Governor of Maine",
+          "predicate": "held by (until May 12)",
+          "object": "Hugh J. Anderson"
         }
       ]
     }

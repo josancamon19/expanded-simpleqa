@@ -45,6 +45,7 @@ def process_article(kg: KGGen, idx: int, article: dict) -> dict | None:
         return {
             "index": idx,
             "title": article["title"],
+            "text": article["text"],
             "graph": graph,
         }
 
@@ -142,7 +143,7 @@ def main():
 
     print(f"\nSuccessfully processed {len(graphs)}/{len(selected_articles)} articles")
 
-    # Save individual graphs
+    # Save individual graphs and article texts
     print(f"\nSaving graphs to {OUTPUT_DIR}/...")
     for item in graphs:
         idx = item["index"]
@@ -152,6 +153,12 @@ def main():
         json_path = os.path.join(OUTPUT_DIR, f"graph_{idx}.json")
         KGGen.export_graph(graph, json_path)
         print(f"  Saved {json_path}")
+
+        # Save article text for query generation
+        article_path = os.path.join(OUTPUT_DIR, f"article_{idx}.txt")
+        with open(article_path, "w") as f:
+            f.write(item["text"])
+        print(f"  Saved {article_path}")
 
         # Save HTML visualization
         html_path = os.path.join(OUTPUT_DIR, f"graph_{idx}.html")

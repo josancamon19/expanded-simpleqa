@@ -12,7 +12,6 @@ Reference: STaRK: Benchmarking LLM Retrieval on Textual and Relational Knowledge
 """
 
 import json
-import os
 import random
 from dataclasses import dataclass
 from pathlib import Path
@@ -46,6 +45,15 @@ def load_graph(graph_idx: int) -> dict:
         return json.load(f)
 
 
+def load_article(graph_idx: int) -> str | None:
+    """Load the source article text for a graph."""
+    article_path = GRAPHS_DIR / f"article_{graph_idx}.txt"
+    if article_path.exists():
+        with open(article_path) as f:
+            return f.read()
+    return None
+
+
 def get_entity_relations(graph: dict, entity: str) -> dict:
     """Get all relations where entity appears as subject or object."""
     as_subject = []
@@ -61,10 +69,11 @@ def get_entity_relations(graph: dict, entity: str) -> dict:
     return {"as_subject": as_subject, "as_object": as_object}
 
 
-def select_answer_entity(graph: dict, min_relations: int = 2) -> tuple[str, dict]:
+def select_answer_entity(graph: dict, min_relations: int = 3) -> tuple[str, dict]:
     """
     Select a candidate answer entity that has sufficient relational context.
     Following STARK: choose entities with rich relational information.
+    Requires more relations (3+) to ensure specificity.
     """
     entities = graph["entities"]
     random.shuffle(entities)
@@ -78,6 +87,7 @@ def select_answer_entity(graph: dict, min_relations: int = 2) -> tuple[str, dict
     # Fallback: return entity with most relations
     best_entity = None
     best_count = 0
+    best_relations = {"as_subject": [], "as_object": []}
     for entity in entities:
         relations = get_entity_relations(graph, entity)
         count = len(relations["as_subject"]) + len(relations["as_object"])
@@ -89,76 +99,81 @@ def select_answer_entity(graph: dict, min_relations: int = 2) -> tuple[str, dict
     return best_entity, best_relations
 
 
-def build_context_for_query(
-    answer_entity: str,
-    relations: dict,
-    max_relations: int = 5
-) -> tuple[list[tuple], str]:
-    """
-    Build relational context for query generation.
-    Returns selected relations and a query type hint.
-    """
-    all_rels = relations["as_subject"] + relations["as_object"]
+# SimpleQA-style few-shot examples for the prompt
+SIMPLEQA_EXAMPLES = """
+Example SimpleQA questions (these are the QUALITY we want):
 
-    if len(all_rels) > max_relations:
-        selected = random.sample(all_rels, max_relations)
-    else:
-        selected = all_rels
+Q: Who received the IEEE Frank Rosenblatt Award in 2010?
+A: Michio Sugeno
 
-    # Determine query type based on relation patterns
-    predicates = [r[1] for r in selected]
+Q: What is the name of the former Prime Minister of Iceland who worked as a cabin crew member until 1971?
+A: Jóhanna Sigurðardóttir
 
-    if any("born" in p.lower() for p in predicates):
-        query_type = "biographical"
-    elif any("member" in p.lower() or "held by" in p.lower() for p in predicates):
-        query_type = "affiliation"
-    elif any("located" in p.lower() or "in" == p.lower() for p in predicates):
-        query_type = "geographical"
-    elif any("founded" in p.lower() or "established" in p.lower() for p in predicates):
-        query_type = "historical"
-    else:
-        query_type = "factual"
+Q: Who won the 1991 Ig Nobel Prize for Peace?
+A: Edward Teller
 
-    return selected, query_type
+Q: In which year did Frida Kahlo's first solo exhibit open?
+A: 1938
+
+Q: Who was the leader of the woman's suffrage movement who was born in 1847?
+A: Victoria Woodhull
+
+Q: What signature piece did Scott Wilson discover on the curb that became part of MOBA's collection?
+A: Lucy in the Field with Flowers
+
+Notice how each question contains ENOUGH SPECIFIC DETAILS that only ONE answer is possible.
+Bad example: "Who was born in 1847?" - TOO VAGUE, many people were born then.
+Good example: "Who was born in 1847 and led the woman's suffrage movement?" - SPECIFIC enough.
+"""
 
 
-QUERY_GENERATION_PROMPT = """You are generating fact-seeking questions for a knowledge graph QA benchmark,
-similar to SimpleQA. Each question must have exactly ONE correct, unambiguous answer.
+QUERY_GENERATION_PROMPT = """You are generating fact-seeking questions for a QA benchmark similar to SimpleQA.
+Each question MUST have exactly ONE correct, unambiguous answer.
 
-Target Answer Entity: {answer_entity}
+{simpleqa_examples}
 
-Relational Facts about this entity:
+---
+
+SOURCE ARTICLE (for context):
+{article_excerpt}
+
+---
+
+TARGET ANSWER: {answer_entity}
+
+RELATIONAL FACTS about this entity from the knowledge graph:
 {relations_text}
 
-Generate {num_queries} different natural language questions where the answer is exactly "{answer_entity}".
+---
 
-Requirements:
-1. Questions should be specific and unambiguous - only ONE answer is correct
-2. Questions should sound natural, like real user queries
-3. Use the relational facts to create questions that require knowledge of relationships
-4. Vary question styles: "Who...", "What...", "Which person/organization/place..."
-5. Questions should be answerable with just the entity name, not a full sentence
-6. Do NOT mention the answer in the question
-7. Make questions that would be challenging but fair - they require specific knowledge
+Generate {num_queries} HIGH-QUALITY questions where the answer is exactly "{answer_entity}".
 
-Output format (JSON array):
+CRITICAL REQUIREMENTS:
+1. Each question must contain ENOUGH SPECIFIC CONSTRAINTS that ONLY the target answer fits
+2. Combine multiple facts: birth year + profession + achievement, OR role + organization + time period, etc.
+3. Questions should sound natural, like a curious person asking
+4. The answer should be a short entity name, not a full sentence
+5. Do NOT mention the answer in the question
+6. Avoid vague questions - if someone knowledgeable couldn't uniquely identify the answer, the question is BAD
+7. Use specific years (not "mid-19th century"), specific roles, specific achievements
+
+Output ONLY a JSON array, no other text:
 [
-  {{"question": "...", "reasoning": "brief note on which relations this uses"}},
-  ...
+  {{"question": "...", "specificity_check": "why this question uniquely identifies the answer"}}
 ]
-
-Generate exactly {num_queries} questions."""
+"""
 
 
 def generate_queries_for_entity(
     answer_entity: str,
     relations: list[tuple],
-    num_queries: int = 3,
+    article_text: str | None,
+    num_queries: int = 1,
     model: str = "gpt-4o-mini"
 ) -> list[dict]:
     """
     Use LLM to generate natural language queries for a target entity.
-    Following STARK's approach of combining relational constraints into natural queries.
+    Includes article context and SimpleQA examples for better quality.
     """
     # Format relations as readable text
     relations_text = "\n".join([
@@ -166,7 +181,15 @@ def generate_queries_for_entity(
         for subj, pred, obj in relations
     ])
 
+    # Use article excerpt if available (first 2000 chars for context)
+    if article_text:
+        article_excerpt = article_text[:2000] + "..." if len(article_text) > 2000 else article_text
+    else:
+        article_excerpt = "(Article text not available)"
+
     prompt = QUERY_GENERATION_PROMPT.format(
+        simpleqa_examples=SIMPLEQA_EXAMPLES,
+        article_excerpt=article_excerpt,
         answer_entity=answer_entity,
         relations_text=relations_text,
         num_queries=num_queries
@@ -181,7 +204,6 @@ def generate_queries_for_entity(
     content = response.choices[0].message.content
 
     # Parse JSON from response
-    # Handle potential markdown code blocks
     if "```json" in content:
         content = content.split("```json")[1].split("```")[0]
     elif "```" in content:
@@ -190,7 +212,6 @@ def generate_queries_for_entity(
     try:
         queries = json.loads(content.strip())
     except json.JSONDecodeError:
-        # Fallback: try to extract array
         import re
         match = re.search(r'\[.*\]', content, re.DOTALL)
         if match:
@@ -218,36 +239,40 @@ def generate_queries_for_graph(
         List of Query objects with questions and gold answers
     """
     graph = load_graph(graph_idx)
+    article_text = load_article(graph_idx)
+
+    if article_text:
+        print(f"  Loaded article text ({len(article_text)} chars)")
+    else:
+        print("  Warning: No article text available")
+
     queries = []
+    used_entities = set()  # Track used entities to ensure diversity
     attempts = 0
-    max_attempts = num_queries * 3  # Allow retries for failed generations
+    max_attempts = num_queries * 5
 
     while len(queries) < num_queries and attempts < max_attempts:
         attempts += 1
 
         # Step 1: Sample answer entity (STARK methodology)
-        answer_entity, relations = select_answer_entity(graph, min_relations=2)
+        answer_entity, relations = select_answer_entity(graph, min_relations=3)
 
-        if not answer_entity:
+        if not answer_entity or answer_entity in used_entities:
             continue
 
-        # Step 2: Build relational context
-        selected_relations, query_type = build_context_for_query(
-            answer_entity, relations, max_relations=5
-        )
+        # Step 2: Get all relations for this entity
+        all_relations = relations["as_subject"] + relations["as_object"]
 
-        if not selected_relations:
+        if len(all_relations) < 2:
             continue
 
-        # Step 3: Generate queries via LLM
-        # Generate fewer per entity to get diversity
-        queries_per_entity = min(3, num_queries - len(queries))
-
+        # Step 3: Generate ONE query per entity for diversity
         try:
             generated = generate_queries_for_entity(
                 answer_entity=answer_entity,
-                relations=selected_relations,
-                num_queries=queries_per_entity,
+                relations=all_relations,
+                article_text=article_text,
+                num_queries=1,  # One query per entity
                 model=model
             )
 
@@ -255,14 +280,27 @@ def generate_queries_for_graph(
                 if len(queries) >= num_queries:
                     break
 
+                # Determine query type
+                predicates = [r[1] for r in all_relations]
+                if any("born" in p.lower() for p in predicates):
+                    query_type = "biographical"
+                elif any("member" in p.lower() or "held by" in p.lower() for p in predicates):
+                    query_type = "affiliation"
+                elif any("located" in p.lower() for p in predicates):
+                    query_type = "geographical"
+                else:
+                    query_type = "factual"
+
                 queries.append(Query(
                     question=q["question"],
                     answer=answer_entity,
                     answer_entity=answer_entity,
-                    supporting_relations=selected_relations,
+                    supporting_relations=all_relations,
                     query_type=query_type,
                     graph_idx=graph_idx
                 ))
+                used_entities.add(answer_entity)
+                print(f"  [{len(queries)}/{num_queries}] {answer_entity}")
 
         except Exception as e:
             print(f"  Warning: Query generation failed for {answer_entity}: {e}")
@@ -272,14 +310,7 @@ def generate_queries_for_graph(
 
 
 def queries_to_simpleqa_format(queries: list[Query]) -> list[dict]:
-    """
-    Convert queries to SimpleQA-compatible format.
-
-    SimpleQA format:
-    - question: The question text
-    - answer: The gold answer (single, unambiguous)
-    - metadata: Additional context
-    """
+    """Convert queries to SimpleQA-compatible format."""
     return [
         {
             "question": q.question,
@@ -311,10 +342,8 @@ def main():
     all_queries = []
 
     if args.graph_idx is not None:
-        # Process single graph
         graph_indices = [args.graph_idx]
     else:
-        # Process all available graphs
         graph_files = list(GRAPHS_DIR.glob("graph_*.json"))
         graph_indices = sorted([
             int(f.stem.split("_")[1])
@@ -323,7 +352,7 @@ def main():
         ])
 
     for idx in graph_indices:
-        print(f"Generating queries for graph_{idx}...")
+        print(f"\nGenerating queries for graph_{idx}...")
         try:
             queries = generate_queries_for_graph(
                 graph_idx=idx,
@@ -331,7 +360,7 @@ def main():
                 model=args.model
             )
             all_queries.extend(queries)
-            print(f"  Generated {len(queries)} queries")
+            print(f"  Total: {len(queries)} queries")
         except Exception as e:
             print(f"  Error processing graph_{idx}: {e}")
 
@@ -342,15 +371,16 @@ def main():
     with open(output_path, "w") as f:
         json.dump(output_data, f, indent=2)
 
-    print(f"\nSaved {len(output_data)} queries to {output_path}")
+    print(f"\n{'='*60}")
+    print(f"Saved {len(output_data)} queries to {output_path}")
+    print(f"{'='*60}")
 
-    # Print sample
+    # Print all queries
     if output_data:
-        print("\nSample queries:")
-        for q in output_data[:3]:
-            print(f"  Q: {q['question']}")
-            print(f"  A: {q['answer']}")
-            print()
+        print("\nGenerated queries:")
+        for i, q in enumerate(output_data, 1):
+            print(f"\n{i}. Q: {q['question']}")
+            print(f"   A: {q['answer']}")
 
 
 if __name__ == "__main__":
